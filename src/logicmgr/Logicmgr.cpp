@@ -15,7 +15,7 @@ Logicmgr::Logicmgr() {
 
 }
 
-ILogicmgr * Logicmgr::Employ() {
+ILogicmgr * Logicmgr::GetInstance() {
     if (NULL == m_pSelf) {
         m_pSelf = NEW Logicmgr;
         if (!m_pSelf->Redry()) {
@@ -33,15 +33,14 @@ bool Logicmgr::Redry() {
 }
 
 bool Logicmgr::Initialize() {
-    //    if (NULL == (m_pKernel = Kernel::Employ()) ||
-    //            NULL == (m_pConfigManage = ConfigManage::Employ()) ||
-    //            NULL == (m_pLogSystem = LogSystem::Employ())) {
+    //    if (NULL == (m_pKernel = Kernel::GetInstance()) ||
+    //            NULL == (m_pConfigManage = ConfigManage::GetInstance()) ||
+    //            NULL == (m_pLogSystem = LogSystem::GetInstance())) {
     //
     //        TASSERT(false ,"Logicmgr::Initialize failed|Get Kernel,ConfigManage, LogSystem error");
     //
     //        return false;
     //    }
-
     //    const CIniConfig * baseconfig = m_pConfigManage->GetConfig(KERNEL_CONFIG_BASE_INI);
     //    if (NULL == baseconfig) {
     //        LOG_ERROR(log, 128, "Logicmgr::Initialize failed|Get BaseConfig Error");

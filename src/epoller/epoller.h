@@ -6,6 +6,7 @@
 #include "header.h"
 #include "epoll_waiter.h"
 #include "INetengine.h"
+#include "tinyxml/tinyxml.h"
 
 class epoll_worker;
 class epoll_waiter;
@@ -17,9 +18,9 @@ public:
     bool Redry();
     bool Initialize();
     bool Destory();
-    
+
     void Run();
-    
+
     bool AddServer(tcore::ITcpServer * server);
     bool AddClient(tcore::ITcpSocket * client);
     s64 DonetIO(s64 overtime);
@@ -43,7 +44,7 @@ private:
 
 private:
     s32 m_epoll;
-    TQueue<struct epoller_data *, true, EPOLLER_DATA_COUNT> m_pIOQueue;
+    TQueue<struct epoller_data *, true, EPOLLER_DATA_COUNT> m_oIOQueue;
     epoll_worker * m_pWorkerAry;
     epoll_waiter * m_pWaiter;
     s32 m_nWorkerCount;

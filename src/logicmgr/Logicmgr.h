@@ -3,6 +3,7 @@
 
 #include "IModule.h"
 #include "ILogicmgr.h"
+#include "tinyxml/tinyxml.h"
 
 #include <string>
 #include <map>
@@ -11,7 +12,7 @@ using namespace std;
 
 class Logicmgr : public ILogicmgr {
 public:
-    static ILogicmgr * Employ();
+    static ILogicmgr * GetInstance();
     virtual bool Redry();
     virtual bool Initialize();
     virtual bool Destory();

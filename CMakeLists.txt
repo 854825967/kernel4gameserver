@@ -8,20 +8,26 @@ SET(CMAKE_CXX_FLAGS_RELEASE "-g -std=c++0x -lpthread -rdynamic -ldl -Dlinux")
 MESSAGE(STATUS "Linux")
 
 INCLUDE_DIRECTORIES(
-        "./src/Public"
-        "./src/API"
+        "./Public"
+        "./API"
+        "./src/"
         "./src/interface"
         "./src/epoller"
         )
 
 SET(SOURCE_FILES
-        "./src/Public/MultiSys.cc"
-        "./src/Public/CThread.cpp"
+        "./Public/MultiSys.cc"
+        "./Public/CThread.cpp"
+        "./Public/tinyxml/tinystr.cpp"
+        "./Public/tinyxml/tinyxml.cpp"
+        "./Public/tinyxml/tinyxmlerror.cpp"
+        "./Public/tinyxml/tinyxmlparser.cpp"
         "./src/epoller/ITcpServer.cpp"
         "./src/epoller/epoll_waiter.cpp"
         "./src/epoller/epoll_worker.cpp"
         "./src/epoller/epoller.cpp"
         "./src/logicmgr/Logicmgr.cpp"
+        "./src/configmgr/Configmgr.cpp"
         "./src/main.cpp"
    )
 

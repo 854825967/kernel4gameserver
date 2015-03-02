@@ -5,6 +5,7 @@
 #include "epoller.h"
 #include "epoll_waiter.h"
 #include "epoll_worker.h"
+#include "configmgr/Configmgr.h"
 using namespace tcore;
 
 tlib::TPool<struct epoller_data, true, 81920> g_EpollerDataPool;
@@ -21,11 +22,12 @@ epoller::~epoller() {
 }
 
 bool epoller::Redry() {
+
     return true;
 }
 
 bool epoller::Initialize() {
-    s32 count = 2;
+    s32 count = Configmgr::getInstance()->GetCoreConfig()->sNetThdCount;
 
     if (m_epoll != 0) {
         ECHO("epoll is created");
@@ -173,7 +175,7 @@ void epoller::AddEvent(struct epoller_data * data) {
 }
 
 void epoller::AddIO(struct epoller_data * data) {
-    m_pIOQueue.Add(data);
+    m_oIOQueue.Add(data);
 }
 
 s64 epoller::DonetIO(s64 overtime) {
@@ -181,7 +183,7 @@ s64 epoller::DonetIO(s64 overtime) {
 
     epoller_data * p;
     while (true) {
-        if (m_pIOQueue.Read(p)) {
+        if (m_oIOQueue.Read(p)) {
             switch (p->opt) {
                 case SO_ACCEPT:
                 {
@@ -216,7 +218,7 @@ s64 epoller::DonetIO(s64 overtime) {
                 }
             }
 
-        } else if (m_pIOQueue.IsEmpty()) {
+        } else if (m_oIOQueue.IsEmpty()) {
             return tools::GetTimeMillisecond() - lTick;
         }
 
