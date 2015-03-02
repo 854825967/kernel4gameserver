@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 32
+/svn/Kernel_3/!svn/ver/1/src/API
+END
+IKernel.h
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/Kernel_3/!svn/ver/1/src/API/IKernel.h
+END
+IModule.h
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/Kernel_3/!svn/ver/1/src/API/IModule.h
+END

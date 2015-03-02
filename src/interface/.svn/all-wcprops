@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/Kernel_3/!svn/ver/1/src/interface
+END
+ILogicmgr.h
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/Kernel_3/!svn/ver/1/src/interface/ILogicmgr.h
+END
+ICore.h
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/Kernel_3/!svn/ver/1/src/interface/ICore.h
+END
+INetengine.h
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/Kernel_3/!svn/ver/1/src/interface/INetengine.h
+END
