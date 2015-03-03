@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <modules path="./modules/">
     <module name="gate" />
-    <module name="console" />
 </modules>

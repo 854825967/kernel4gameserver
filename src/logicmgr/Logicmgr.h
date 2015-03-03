@@ -12,7 +12,7 @@ using namespace std;
 
 class Logicmgr : public ILogicmgr {
 public:
-    static ILogicmgr * GetInstance();
+    static ILogicmgr * getInstance();
     virtual bool Redry();
     virtual bool Initialize();
     virtual bool Destory();
@@ -23,9 +23,7 @@ private:
     ~Logicmgr();
 
 private:
-    static Logicmgr * m_pSelf;
-
-    vector<void *> m_vctDllHandle;
+    vector<IModule *> m_vctModules;
     map<string, IModule *> m_mapModules;
 };
 

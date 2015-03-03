@@ -21,6 +21,20 @@ epoller::~epoller() {
     }
 }
 
+INetengine * epoller::getInstance() {
+    static INetengine * p = NULL;
+    if (!p) {
+        p = NEW epoller;
+        if (!p->Redry()) {
+            TASSERT(false, "epoller can't be ready");
+            delete p;
+            p = NULL;
+        }
+    }
+    
+    return p;
+}
+
 bool epoller::Redry() {
 
     return true;
@@ -59,6 +73,7 @@ bool epoller::Initialize() {
 }
 
 bool epoller::Destory() {
+    delete this;
     return true;
 }
 

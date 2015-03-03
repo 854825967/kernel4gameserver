@@ -5,6 +5,7 @@
 #include "ICore.h"
 
 #include <vector>
+#include <string>
 using namespace std;
 
 struct sCoreConfig {

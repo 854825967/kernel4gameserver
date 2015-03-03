@@ -13,8 +13,8 @@ class epoll_waiter;
 
 class epoller : public INetengine {
 public:
-    epoller();
-    ~epoller();
+    static INetengine * getInstance();
+    
     bool Redry();
     bool Initialize();
     bool Destory();
@@ -39,6 +39,10 @@ public:
     void AddIO(struct epoller_data * data);
 
 private:
+    epoller();
+    ~epoller();
+    
+    
     bool InitEpollHandler(s32 & handler, s32 count);
     void Doevent();
 

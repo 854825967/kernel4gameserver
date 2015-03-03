@@ -40,6 +40,7 @@ bool Configmgr::Initialize() {
 }
 
 bool Configmgr::Destory() {
+    delete this;
     return true;
 }
 

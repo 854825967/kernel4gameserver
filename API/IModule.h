@@ -3,8 +3,8 @@
 
 #include "MultiSys.h"
 #include "Tools.h"
-
-class IKernel;
+#include "IKernel.h"
+using namespace tcore;
 
 #define MODULE_NAME_LENGTH 64
 
@@ -49,7 +49,6 @@ typedef IModule * (*GetModuleFun)(void);
 #define NAME_OF_GET_LOGIC_FUN "GetLogicModule"
 #define GET_LOGIC_FUN GetLogicModule
 
-#ifndef KERNEL_PROCESS
 #define CREATE_MODULE(name) \
     class factroy##name    \
     {    \
@@ -71,7 +70,5 @@ extern "C" IModule * GET_LOGIC_FUN() {    \
     srand(tools::GetTimeMillisecond()); \
     return plogicModule; \
 }
-
-#endif    //KERNEL_PROCESS
 
 #endif  //__IModule_h__
