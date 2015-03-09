@@ -36,10 +36,14 @@ namespace tools {
             return pStrPath;
         }
 
-        inline s64 GetTimeMillisecond() {
+        inline s64 GetTimeMicrosecond() {
             struct timeval tv;
             gettimeofday(&tv, NULL);
-            return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+            return tv.tv_sec * 1000 * 1000 + tv.tv_usec;
+        }
+        
+        inline s64 GetTimeMillisecond() {
+            return GetTimeMicrosecond()/1000;
         }
 
 #ifdef __cplusplus
