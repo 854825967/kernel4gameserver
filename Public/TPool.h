@@ -15,21 +15,31 @@ using namespace std;
         lock->UnLock(); \
     }
 namespace tlib {
-    template <typename type, bool lock = false, s32 size = 4096>
+
+    template <typename type, bool lock = false, s32 size = 64 >
     class TPool {
     public:
         typedef list<type *> UNIT_POOL;
+
         TPool() {
-            for (s32 i=0; i<size; i++) {
-                m_list.push_back(m_szUnit+i);
-            }
+            m_pUnitAry = 0;
+            m_sBlockCount = 0;
             if (lock) {
                 m_pLock = NEW CLockUnit;
                 TASSERT(m_pLock, "new faild");
             }
+
+            AllocNewBlob();
         }
 
         ~TPool() {
+            for (s32 i = 0; i < m_sBlockCount; i++) {
+                ECHO("i %d", i);
+                delete[] m_pUnitAry[i];
+            }
+
+            delete m_pUnitAry;
+
             if (lock) {
                 delete m_pLock;
             }
@@ -38,58 +48,97 @@ namespace tlib {
         type * Create() {
             type * p = NULL;
             POOL_OPT_LOCK(lock, m_pLock);
-    #ifdef _DEBUG
+#ifdef _DEBUG
             static s32 test = 0;
-            test ++;
-    #endif //_DEBUG
+            test++;
+#endif //_DEBUG
+            if (m_list.empty()) {
+                AllocNewBlob();
+            }
+
             typename UNIT_POOL::iterator itor = m_list.begin();
+
             if (itor != m_list.end()) {
                 p = *itor;
                 m_list.erase(itor);
             }
-    #ifdef _DEBUG
-            test --;
+#ifdef _DEBUG
+            test--;
             TASSERT(test == 0, "tpool has some bugs");
-    #endif //_DEBUG
+#endif //_DEBUG
             POOL_OPT_FREELOCK(lock, m_pLock);
             return p;
         }
 
         bool Recover(type * pUnit) {
-            if ( (char *)pUnit < (char *)m_szUnit 
-                || (char *)pUnit > (char *)(m_szUnit + size - 1)
-                || 0 != ((char *)pUnit - (char *)m_szUnit)%sizeof(type) ) {
-                    TASSERT(false, "point adress error");
-                    return false;
+            if (!CheckAddr(pUnit)) {
+                TASSERT(false, "point adress error");
+                return false;
             }
             POOL_OPT_LOCK(lock, m_pLock);
-    #ifdef _DEBUG
+#ifdef _DEBUG
             static s32 test = 0;
-            test ++;
-    #endif //_DEBUG
+            test++;
+#endif //_DEBUG
             typename UNIT_POOL::iterator ibegin = m_list.begin();
             typename UNIT_POOL::iterator iend = m_list.end();
             typename UNIT_POOL::iterator itor = ::find(ibegin, iend, pUnit);
             if (itor != iend) {
-    #ifdef _DEBUG
-                test --;
+#ifdef _DEBUG
+                test--;
                 TASSERT(test == 0, "tpool has some bugs");
-    #endif //_DEBUG
+#endif //_DEBUG
                 POOL_OPT_FREELOCK(lock, m_pLock);
                 return false;
             }
             m_list.push_back(pUnit);
-    #ifdef _DEBUG
-            test --;
+#ifdef _DEBUG
+            test--;
             TASSERT(test == 0, "tpool has some bugs");
-    #endif //_DEBUG
+#endif //_DEBUG
             POOL_OPT_FREELOCK(lock, m_pLock);
             return true;
+        }
+    private:
+
+        void AllocNewBlob() {
+            POOL_OPT_LOCK(lock, m_pLock);
+            if (m_pUnitAry == NULL) {
+                TASSERT(m_sBlockCount == 0, "pool bug");
+                m_pUnitAry = NEW type*;
+            } else {
+                type ** p = NEW type*[m_sBlockCount + 1];
+                memcpy(p, m_pUnitAry, m_sBlockCount * sizeof (type *));
+                delete[] m_pUnitAry;
+                m_pUnitAry = p;
+            }
+
+
+            m_pUnitAry[m_sBlockCount] = NEW type[size];
+            for (s32 i = 0; i < size; i++) {
+                m_list.push_back(m_pUnitAry[m_sBlockCount] + i);
+            }
+            m_sBlockCount += 1;
+            POOL_OPT_FREELOCK(lock, m_pLock);
+        }
+
+        bool CheckAddr(type * pUnit) {
+            for (s32 i = 0; i < m_sBlockCount; i++) {
+                if (pUnit >= &(m_pUnitAry[i][0])
+                        && pUnit <= &(m_pUnitAry[i][size - 1])
+                        && 0 == ((char *)pUnit - (char *)&(m_pUnitAry[i][0])) % sizeof (type)) {
+
+                    return true;
+                }
+            }
+            
+            return false;
         }
 
     private:
         UNIT_POOL m_list;
-        type m_szUnit[size];
+        s32 m_sBlockCount;
+        type ** m_pUnitAry;
         CLockUnit * m_pLock;
     };
 }
