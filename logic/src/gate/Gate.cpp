@@ -15,10 +15,10 @@ bool Gate::Initialize(IKernel * pKernel) {
 
 bool Gate::Launched(IKernel * pKernel) {
     ECHO("ready go, I'm gate");
-    
+
     InitAddr("0.0.0.0", 12580);
     pKernel->StartTcpServer(this);
-    
+
     return true;
 }
 
@@ -27,11 +27,12 @@ bool Gate::Destroy(IKernel * pKernel) {
     return true;
 }
 
-void Gate::Error(const s8 opt, const s32 code) {
-    
+void Gate::Error(IKernel * pKernel, const s8 opt, const s32 code) {
+
 }
 
-ITcpSocket * Gate::MallocConnection() {
+ITcpSocket * Gate::MallocConnection(IKernel * pKernel) {
     ECHO("NEW CONNECTION");
+
     return NEW ClientConnectSick;
 }

@@ -59,7 +59,7 @@ extern "C" {
 }
 #endif
 
-extern tlib::TPool<struct epoller_data, true, 81920> g_EpollerDataPool;
+extern tlib::TPool<struct epoller_data, true, 128> g_EpollerDataPool;
 
 #endif	/* HEADER_H */
 

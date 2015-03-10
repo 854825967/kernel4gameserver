@@ -31,6 +31,7 @@ SET(KERNEL_FILES
         "${PROJECT_SOURCE_DIR}/src/epoller/epoller.cpp"
         "${PROJECT_SOURCE_DIR}/src/logicmgr/Logicmgr.cpp"
         "${PROJECT_SOURCE_DIR}/src/configmgr/Configmgr.cpp"
+        "${PROJECT_SOURCE_DIR}/src/timermgr/Timermgr.cpp"
         "${PROJECT_SOURCE_DIR}/src/Kernel.cpp"
         "${PROJECT_SOURCE_DIR}/src/main.cpp"
    )

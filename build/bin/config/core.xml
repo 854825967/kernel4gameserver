@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <core xmlns="http://www.netbeans.org/ns/project/1">
     <loop tick="33" />
-    <netthread count="4" frametick="10" />
+    <netthread count="4" frametick="16" />
     <httpthread count="1" frametick="5" />
-    <timer tick="10" />
+    <timer tick="11" />
 </core>

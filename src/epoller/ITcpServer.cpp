@@ -1,5 +1,6 @@
 #include "IKernel.h"
 #include "epoller.h"
+#include "Kernel.h"
 #include <arpa/inet.h>
 namespace tcore {
 
@@ -91,7 +92,7 @@ namespace tcore {
                 s32 sendlen = send(socket_handler, m_sendStream.buff(), m_sendStream.size(), 0);
                 m_sendStream.FreeWrite();
                 if (sendlen > 0) {
-                    ECHO("send buff len %d", sendlen);
+                    //ECHO("send buff len %d", sendlen);
                     m_sendStream.out(sendlen);
                 } else if (sendlen == -1) {
                     if (EAGAIN == errno) {
@@ -152,7 +153,7 @@ namespace tcore {
                 || 0 > getsockopt(socket_handler, SOL_SOCKET, SO_ERROR, &status, &slen)
                 || 0 != status) {
             ECHO("getsockopt error %s", strerror(errno));
-            Error(SO_CONNECT, -1);
+            Error(Kernel::getInstance(), SO_CONNECT, -1);
 
             bool res = pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
             TASSERT(res, strerror(errno));
@@ -160,7 +161,7 @@ namespace tcore {
         } else {
 //            ECHO("non-blocking connect success");
             m_nStatus = SS_ESTABLISHED;
-            Error(SO_CONNECT, 0);
+            Error(Kernel::getInstance(), SO_CONNECT, 0);
 
             bool res = pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
             TASSERT(res, strerror(errno));
@@ -176,7 +177,7 @@ namespace tcore {
 
             res = pEpoller->epoller_CTL(EPOLL_CTL_ADD, socket_handler, &ev);
             TASSERT(res, strerror(errno));
-            Connected();
+            Connected(Kernel::getInstance());
         }
 
     }
@@ -189,7 +190,7 @@ namespace tcore {
             s32 handler = accept(socket_handler, (sockaddr *) & addr, &len);
             while (handler >= 0) {
                 if (setnonblocking(handler)) {
-                    ITcpSocket * pSocket = MallocConnection();
+                    ITcpSocket * pSocket = MallocConnection(Kernel::getInstance());
                     TASSERT(pSocket, "tcpsocket point is null");
                     memcpy(&pSocket->m_addr, &addr, sizeof (pSocket->m_addr));
                     SafeSprintf(pSocket->ip, sizeof (pSocket->ip), inet_ntoa(addr.sin_addr));
@@ -209,7 +210,7 @@ namespace tcore {
 
                     bool res = pEpoller->epoller_CTL(EPOLL_CTL_ADD, pSocket->socket_handler, &ev);
                     TASSERT(res, strerror(errno));
-                    pSocket->Connected();
+                    pSocket->Connected(Kernel::getInstance());
                 } else {
                     ECHO("setnonblock error %s", strerror(errno));
                     shut_socket(handler);
@@ -221,7 +222,7 @@ namespace tcore {
 //            ECHO("accept over");
         } else {
             ECHO("bad accept %s", strerror(errno));
-            Error(SO_ACCEPT, errno);
+            Error(Kernel::getInstance(), SO_ACCEPT, errno);
             bool res = pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
             TASSERT(res, strerror(errno));
             shut_socket(socket_handler);

@@ -7,6 +7,7 @@
 namespace tcore {
 
 #define BUFF_SIZE 512
+    class IKernel;
 
     enum eSocketOpt {
         SO_ACCEPT,
@@ -31,7 +32,7 @@ namespace tcore {
             m_nStatus = SS_UNINITIALIZE;
         }
 
-        virtual void Error(const s8 opt, const s32 code) = 0; //code:0=success
+        virtual void Error(IKernel * pKernel, const s8 opt, const s32 code) = 0; //code:0=success
 
         inline void InitAddr(const char * _ip, const s32 _port) {
             memset(ip, 0, sizeof (ip));
@@ -59,10 +60,10 @@ namespace tcore {
 
     class ITcpSocket : public ISocket {
     public:
-        virtual s32 Recv(void * context, const s32 size) = 0; // return size that u use;
+        virtual s32 Recv(IKernel * pKernel, void * context, const s32 size) = 0; // return size that u use;
 
-        virtual void Disconnect() = 0;
-        virtual void Connected() = 0;
+        virtual void Disconnect(IKernel * pKernel) = 0;
+        virtual void Connected(IKernel * pKernel) = 0;
 
         inline void Send(const void * context, const s32 size) {
             if (m_nStatus == SS_ESTABLISHED) {
@@ -80,18 +81,34 @@ namespace tcore {
 
     class ITcpServer : public ISocket {
     public:
-        virtual ITcpSocket * MallocConnection() = 0;
+        virtual ITcpSocket * MallocConnection(IKernel * pKernel) = 0;
 
         void DoAccept(s32 flags, void * pContext);
 
     };
 
+    class ITimer {
+    public:
+        virtual void OnStart(IKernel * pKernel, const s32 sTimerID, s64 lTimetick) = 0; //called before first OnTimer, do not affect OnTimer count
+        virtual void OnTime(IKernel * pKernel, const s32 sTimerID, s64 lTimetick) = 0;
+
+        //called after last OnTimer or remove timer, do not affect OnTimer count
+        //nonviolent will be false if timer is removed by developer,  otherwise true 
+        virtual void OnTerminate(IKernel * pKernel, const s32 sTimerID, bool nonviolent, s64 lTimetick) = 0;
+    };
+
     class IKernel {
     public:
+
+        // net interface
         virtual bool StartTcpServer(ITcpServer * sever) = 0;
         virtual bool StartTcpClient(ITcpSocket * client) = 0;
-        
-        
+
+        // tiemr interface 
+        virtual bool StartTimer(s32 id, tcore::ITimer * timer, s64 interval, s64 delay = 0, s64 loop = -1) = 0; //-1 is forever
+        virtual bool KillTimer(s32 id, ITimer * timer) = 0;
+        virtual bool KillTimer(tcore::ITimer * timer) = 0;
+
         //shutdown kernel
         virtual void Shutdown() = 0;
     };

@@ -6,9 +6,10 @@
 #include "epoll_waiter.h"
 #include "epoll_worker.h"
 #include "configmgr/Configmgr.h"
+#include "Kernel.h"
 using namespace tcore;
 
-tlib::TPool<struct epoller_data, true, 81920> g_EpollerDataPool;
+tlib::TPool<struct epoller_data, true, 128> g_EpollerDataPool;
 
 epoller::epoller() {
     m_epoll = 0;
@@ -113,7 +114,7 @@ bool epoller::AddServer(ITcpServer * server) {
 
     if (bind(server->socket_handler, (sockaddr *) & server->m_addr, sizeof (server->m_addr)) != 0) {
         ECHO("add server error : %s", strerror(errno));
-        server->Error(SO_ACCEPT, errno);
+        server->Error(Kernel::getInstance(), SO_ACCEPT, errno);
         shut_socket(server->socket_handler);
         server->socket_handler = 0;
         return false;
@@ -121,7 +122,7 @@ bool epoller::AddServer(ITcpServer * server) {
 
     if (listen(server->socket_handler, 4096) != 0) {
         ECHO("add server error : %s", strerror(errno));
-        server->Error(SO_ACCEPT, errno);
+        server->Error(Kernel::getInstance(), SO_ACCEPT, errno);
         shut_socket(server->socket_handler);
         server->socket_handler = 0;
         return false;
@@ -164,9 +165,9 @@ bool epoller::AddClient(ITcpSocket * client) {
 
     s32 ret = connect(client->socket_handler, (struct sockaddr *) &client->m_addr, sizeof (client->m_addr));
     if (ret == 0) {
-        client->Error(SO_CONNECT, 0);
+        client->Error(Kernel::getInstance(), SO_CONNECT, 0);
     } else if (ret < 0 && errno != EINPROGRESS) {
-        client->Error(SO_CONNECT, errno);
+        client->Error(Kernel::getInstance(), SO_CONNECT, errno);
         ECHO("connect error %s", strerror(errno));
         return false;
     } else {
@@ -216,15 +217,15 @@ s64 epoller::DonetIO(s64 overtime) {
                 case SO_TCPIO:
                 {
                     ITcpSocket * client = (ITcpSocket *) p->user_ptr;
-                    client->Error(p->opt, p->code);
+                    client->Error(Kernel::getInstance(), p->opt, p->code);
                     if (p->code != -1 && p->len != 0) {
                         s32 use_size;
                         client->m_recvStream.LockRead();
-                        use_size = client->Recv((void *) client->m_recvStream.buff(), client->m_recvStream.size());
+                        use_size = client->Recv(Kernel::getInstance(), (void *) client->m_recvStream.buff(), client->m_recvStream.size());
                         client->m_recvStream.FreeRead();
                         client->m_recvStream.out(use_size);
                     } else {
-                        client->Disconnect();
+                        client->Disconnect(Kernel::getInstance());
                     }
 
                     g_EpollerDataPool.Recover(p);
