@@ -59,12 +59,12 @@ bool Logicmgr::Initialize() {
 #endif //linux
 
 #ifdef WIN32
-        SafeSprintf(path, sizeof (path), "%s/%s/lib%s.dll",
+        SafeSprintf(path, sizeof (path), "%s/%s/%s.dll",
             tools::GetAppPath(), pConfig->strModulePath.c_str(), (*itor).c_str());
 
         ECHO("module path : %s", path);
         HINSTANCE hinst = ::LoadLibrary(path);
-        GetModuleFun fun = (GetModuleFun)::GetProcAddress(hinst, "GetLogicModule");
+        GetModuleFun fun = (GetModuleFun)::GetProcAddress(hinst, NAME_OF_GET_LOGIC_FUN);
         TASSERT(fun, "get function:GetLogicModule error");
 #endif //WIN32
 

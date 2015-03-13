@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-PROJECT(TKERNEL)
+PROJECT(T-Kernel)
 #÷∏∂®±‡“Î∆˜
 IF(LINUX)
     SET(CMAKE_CXX_FLAGS "-g -std=c++0x -Wall -lpthread -rdynamic -ldl -Dlinux -D_DEBUG")
@@ -137,10 +137,16 @@ ADD_EXECUTABLE(kernel
         ${KERNEL}
         )
 ENDIF(WIN32)
+IF(LINUX)
+SET(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build/linux")
+ENDIF(LINUX)
+
+IF(WIN32)
+SET(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build/windows")
+ENDIF(WIN32)
 
 TARGET_LINK_LIBRARIES(kernel ${STATIC_LIBRARYS})
 
-SET(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build/bin")
 
 ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/logic/src/)
 

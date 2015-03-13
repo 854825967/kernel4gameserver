@@ -2,7 +2,7 @@
 
 namespace tlib {
 #ifdef WIN32
-    static THREAD_FUN ThreadProc(LPVOID lpParam) {
+    static THREAD_FUN __stdcall ThreadProc(LPVOID lpParam) {
         CThread * pThis = (CThread *)lpParam;
         TASSERT(pThis, "a null thread owner point");
         pThis->Run();

@@ -14,8 +14,6 @@ SET(GATE_FILES
     "${PROJECT_SOURCE_DIR}/logic/src/gate/main.cpp"
     )
     
-SET(LIBRARY_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build/bin/modules")
-
 ADD_LIBRARY(gate SHARED
         ${GATE_FILES}
         )

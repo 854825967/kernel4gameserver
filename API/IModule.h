@@ -63,12 +63,24 @@ typedef IModule * (*GetModuleFun)(void);
     };    \
     factroy##name factroy##name(plogicModule);
 
-
+#ifdef linux
 #define GET_DLL_ENTRANCE \
 static IModule * plogicModule = NULL; \
 extern "C" IModule * GET_LOGIC_FUN() {    \
     srand(tools::GetTimeMillisecond()); \
     return plogicModule; \
 }
+#endif //linux
+
+#ifdef WIN32
+#define GET_DLL_ENTRANCE \
+    static IModule * plogicModule = NULL; \
+    extern "C" __declspec(dllexport) IModule * __cdecl GetLogicModule() {    \
+        return plogicModule; \
+    } \
+    BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) { \
+        return TRUE;    \
+    }
+#endif //WIN32
 
 #endif  //__IModule_h__

@@ -57,7 +57,7 @@ public:
     s64 m_sInterval;
     s64 m_sNextRunTick;
     s32 m_sID;
-    s32 m_sLoop;
+    s64 m_sLoop;
     tcore::ITimer * m_pTimer;
 };
 
