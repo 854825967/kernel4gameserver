@@ -2,8 +2,6 @@
 #define __Tools_h__
 
 #include "MultiSys.h"
-#include <sys/time.h>
-#include <libgen.h>
 #include <string>
 using namespace std;
 
@@ -20,7 +18,7 @@ namespace tools {
                 char link[256];
                 memset(link, 0, 256);
                 memset(pStrPath, 0, 256);
-#if defined __linux__
+#ifdef linux
                 //SafeSprintf(link, sizeof(link), "/proc/self/exe", getpid());
                 SafeSprintf(link, sizeof (link), "/proc/self/exe");
 
@@ -30,16 +28,27 @@ namespace tools {
                 }
                 //pStrPath[nCount] = 0;
                 pStrPath = dirname(pStrPath);
-#endif //__linux__
+#endif //linux
+
+#ifdef WIN32
+                GetModuleFileName(NULL, pStrPath, 256);
+                PathRemoveFileSpec(pStrPath);
+#endif //WIN32
             }
 
             return pStrPath;
         }
 
         inline s64 GetTimeMicrosecond() {
+#ifdef linux
             struct timeval tv;
             gettimeofday(&tv, NULL);
             return tv.tv_sec * 1000 * 1000 + tv.tv_usec;
+#endif //linux
+
+#ifdef WIN32
+            return 0;
+#endif //WIN32
         }
         
         inline s64 GetTimeMillisecond() {

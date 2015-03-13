@@ -1,8 +1,15 @@
 #include "Kernel.h"
 #include "configmgr/Configmgr.h"
-#include "epoller/epoller.h"
 #include "logicmgr/Logicmgr.h"
 #include "timermgr/Timermgr.h"
+
+#ifdef linux
+#include "epoller/epoller.h"
+typedef epoller netengine;
+#endif //linux
+
+#ifdef WIN32
+#endif //WIN32
 using namespace tcore;
 
 Kernel::Kernel() {
@@ -27,13 +34,16 @@ IKernel * Kernel::getInstance() {
 }
 
 bool Kernel::Redry() {
-    return Configmgr::getInstance() && Timermgr::getInstance() && epoller::getInstance() && Logicmgr::getInstance();
+    return Configmgr::getInstance()
+        && Timermgr::getInstance()
+        //&& netengine::getInstance() 
+        && Logicmgr::getInstance();
 }
 
 bool Kernel::Initialize() {
     return Configmgr::getInstance()->Initialize()
             && Timermgr::getInstance()->Initialize()
-            && epoller::getInstance()->Initialize()
+            //&& netengine::getInstance()->Initialize()
             && Logicmgr::getInstance()->Initialize();
 }
 
@@ -41,7 +51,7 @@ bool Kernel::Destory() {
     Configmgr::getInstance()->Destory();
     Logicmgr::getInstance()->Destory();
     Timermgr::getInstance()->Destory();
-    epoller::getInstance()->Destory();
+    //netengine::getInstance()->Destory();
 
     delete this;
     return true;
@@ -54,7 +64,7 @@ void Kernel::Shutdown() {
 void Kernel::Loop() {
     m_bShutdown = false;
     while (!m_bShutdown) {
-        epoller::getInstance()->DonetIO(Configmgr::getInstance()->GetCoreConfig()->sNetframetick);
+        // netengine::getInstance()->DonetIO(Configmgr::getInstance()->GetCoreConfig()->sNetframetick);
         s64 tick = Timermgr::getInstance()->Dotimer();
         if (tick > 1) {
             ECHO("tick :%ld", tick);
@@ -63,15 +73,16 @@ void Kernel::Loop() {
 }
 
 bool Kernel::StartTcpServer(tcore::ITcpServer * sever) {
-    return epoller::getInstance()->AddServer(sever);
+    //return netengine::getInstance()->AddServer(sever);
+    return false;
 }
 
 bool Kernel::StartTcpClient(tcore::ITcpSocket * client) {
-    return epoller::getInstance()->AddClient(client);
+    //return netengine::getInstance()->AddClient(client);
+    return false;
 }
 
 // tiemr interface 
-
 bool Kernel::StartTimer(s32 id, tcore::ITimer * timer, s64 interval, s64 delay, s64 loop) {
     return Timermgr::getInstance()->StartTimer(id, timer, interval, delay, loop);
 }

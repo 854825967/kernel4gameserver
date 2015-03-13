@@ -1,5 +1,4 @@
 #include "CThread.h"
-#include <pthread.h>
 
 namespace tlib {
 #ifdef WIN32
@@ -50,10 +49,10 @@ namespace tlib {
     
     bool CThread::Wait() {
 #ifdef WIN32
-        if (WaitForSingleObject((HANDLE)m_hThread, INFINITE) != WAIT_OBJECT_0)
-        {
-            return false;
-        }
+//         if (WaitForSingleObject((HANDLE)m_hThread, INFINITE) != WAIT_OBJECT_0)
+//         {
+//             return false;
+//         }
 #else
         if (pthread_join((pthread_t)m_hThread, NULL) != 0)
         {
@@ -65,7 +64,8 @@ namespace tlib {
 
     bool CThread::Terminate() {
 #ifdef WIN32
-        return TerminateThread((HANDLE)m_hThread, 1) ? true :false;
+        //       return TerminateThread((HANDLE)m_hThread, 1) ? true :false;
+        return false;
 #else
         return pthread_cancel((pthread_t)m_hThread) == 0 ? true : false;
 #endif

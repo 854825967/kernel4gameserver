@@ -6,10 +6,15 @@
  */
 
 #include "Logicmgr.h"
-#include <dlfcn.h>
 #include "IKernel.h"
 #include "configmgr/Configmgr.h"
 #include "Kernel.h"
+#ifdef WIN32
+#endif //WIN32
+
+#ifdef linux
+#include <dlfcn.h>
+#endif //linux
 
 Logicmgr::Logicmgr() {
 
@@ -41,6 +46,7 @@ bool Logicmgr::Initialize() {
     vector<string>::const_iterator iend = pConfig->vctModules.end();
     while (itor != iend) {
         char path[512] = {0};
+#ifdef linux
         SafeSprintf(path, sizeof (path), "%s/%s/lib%s.so",
                 tools::GetAppPath(), pConfig->strModulePath.c_str(), (*itor).c_str());
 
@@ -50,6 +56,17 @@ bool Logicmgr::Initialize() {
 
         GetModuleFun fun = (GetModuleFun) dlsym(handle, "GetLogicModule");
         TASSERT(fun, "get function:GetLogicModule error");
+#endif //linux
+
+#ifdef WIN32
+        SafeSprintf(path, sizeof (path), "%s/%s/lib%s.dll",
+            tools::GetAppPath(), pConfig->strModulePath.c_str(), (*itor).c_str());
+
+        ECHO("module path : %s", path);
+        HINSTANCE hinst = ::LoadLibrary(path);
+        GetModuleFun fun = (GetModuleFun)::GetProcAddress(hinst, "GetLogicModule");
+        TASSERT(fun, "get function:GetLogicModule error");
+#endif //WIN32
 
         IModule * plogic = fun();
         TASSERT(plogic, "can't get module from lig%s.so", (*itor).c_str());

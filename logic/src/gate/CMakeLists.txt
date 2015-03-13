@@ -2,11 +2,6 @@
 #author:T
 #created:2015-01-12 15:07:04
 
-SET(CMAKE_CXX_FLAGS "-g -std=c++0x -Wall -lpthread -rdynamic -ldl -Dlinux -D_DEBUG")
-SET(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++0x -lpthread -rdynamic -ldl -Dlinux -D_DEBUG")
-SET(CMAKE_CXX_FLAGS_RELEASE "-g -std=c++0x -lpthread -rdynamic -ldl -Dlinux")
-MESSAGE(STATUS "Linux")
-
 INCLUDE_DIRECTORIES(
         "${PROJECT_SOURCE_DIR}/Public"
         "${PROJECT_SOURCE_DIR}/API"
