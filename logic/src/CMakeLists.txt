@@ -9,5 +9,13 @@ ENDIF(LINUX)
 IF(WIN32)
 SET(LIBRARY_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build/windows")
 ENDIF(WIN32)
+        
+SET(LOGIC_INTERFACE
+    "${PROJECT_SOURCE_DIR}/logic/src/interface/IGate.h"
+    )
+    
+SET(LOGIC_DEFINE
+    "${PROJECT_SOURCE_DIR}/logic/src/define/ProtocolID.h"
+    )
 
 ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/logic/src/gate)

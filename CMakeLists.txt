@@ -29,7 +29,7 @@ INCLUDE_DIRECTORIES(
     "${PROJECT_SOURCE_DIR}/src/epoller"
     )
 
-SET(TINYXML_FILES
+SET(TINYXML
     "${PROJECT_SOURCE_DIR}/Public/tinyxml/tinystr.cpp"
     "${PROJECT_SOURCE_DIR}/Public/tinyxml/tinystr.h"
     "${PROJECT_SOURCE_DIR}/Public/tinyxml/tinyxml.cpp"
@@ -38,7 +38,7 @@ SET(TINYXML_FILES
     "${PROJECT_SOURCE_DIR}/Public/tinyxml/tinyxmlparser.cpp"
     )
 
-SET(PUBLIC_FILES
+SET(PUBLIC
     "${PROJECT_SOURCE_DIR}/Public/CLock.h"
     "${PROJECT_SOURCE_DIR}/Public/CLockUnit.h"
     "${PROJECT_SOURCE_DIR}/Public/CRand.h"
@@ -54,7 +54,7 @@ SET(PUBLIC_FILES
     "${PROJECT_SOURCE_DIR}/Public/TStream.h"
     )
 
-SET(API_FILES
+SET(API
     "${PROJECT_SOURCE_DIR}/API/IKernel.h"
     "${PROJECT_SOURCE_DIR}/API/IModule.h"
     )
@@ -106,9 +106,9 @@ SET(KERNEL
         "${PROJECT_SOURCE_DIR}/src/main.cpp"
    )
    
-SOURCE_GROUP(API FILES ${API_FILES})
-SOURCE_GROUP(Public\\tinyxml FILES ${TINYXML_FILES})
-SOURCE_GROUP(Public FILES ${PUBLIC_FILES})
+SOURCE_GROUP(API FILES ${API})
+SOURCE_GROUP(Public\\tinyxml FILES ${TINYXML})
+SOURCE_GROUP(Public FILES ${PUBLIC})
 
 SOURCE_GROUP(src\\interface FILES ${KERNEL_INTERFACE})
 SOURCE_GROUP(src\\configmgr FILES ${KERNEL_CONFIG_MGR})
@@ -120,9 +120,9 @@ SOURCE_GROUP(src FILES ${KERNEL})
 
 IF(LINUX)
 ADD_EXECUTABLE(kernel
-        ${API_FILES}
-        ${TINYXML_FILES}
-        ${PUBLIC_FILES}
+        ${API}
+        ${TINYXML}
+        ${PUBLIC}
         ${KERNEL_INTERFACE}
         ${KERNEL_CONFIG_MGR}
         ${KERNEL_LOGIC_MGR}
@@ -134,9 +134,9 @@ ENDIF(LINUX)
 
 IF(WIN32)
 ADD_EXECUTABLE(kernel
-        ${API_FILES}
-        ${TINYXML_FILES}
-        ${PUBLIC_FILES}
+        ${API}
+        ${TINYXML}
+        ${PUBLIC}
         ${KERNEL_INTERFACE}
         ${KERNEL_CONFIG_MGR}
         ${KERNEL_LOGIC_MGR}
