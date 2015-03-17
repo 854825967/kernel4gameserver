@@ -3,7 +3,6 @@
 
 #include "MultiSys.h"
 
-
 #if defined WIN32
 namespace tlib{
     class CLockUnit {

@@ -2,6 +2,7 @@
 #include "configmgr/Configmgr.h"
 #include "logicmgr/Logicmgr.h"
 #include "timermgr/Timermgr.h"
+using namespace tcore;
 
 #ifdef linux
 #include "epoller/epoller.h"
@@ -9,8 +10,9 @@ typedef epoller netengine;
 #endif //linux
 
 #ifdef WIN32
+#include "iocper/iocper.h"
+typedef iocper netengine;
 #endif //WIN32
-using namespace tcore;
 
 Kernel::Kernel() {
     m_bShutdown = true;
@@ -36,14 +38,14 @@ IKernel * Kernel::getInstance() {
 bool Kernel::Redry() {
     return Configmgr::getInstance()
         && Timermgr::getInstance()
-        //&& netengine::getInstance() 
+        && netengine::getInstance() 
         && Logicmgr::getInstance();
 }
 
 bool Kernel::Initialize() {
     return Configmgr::getInstance()->Initialize()
             && Timermgr::getInstance()->Initialize()
-            //&& netengine::getInstance()->Initialize()
+            && netengine::getInstance()->Initialize()
             && Logicmgr::getInstance()->Initialize();
 }
 
@@ -51,7 +53,7 @@ bool Kernel::Destory() {
     Configmgr::getInstance()->Destory();
     Logicmgr::getInstance()->Destory();
     Timermgr::getInstance()->Destory();
-    //netengine::getInstance()->Destory();
+    netengine::getInstance()->Destory();
 
     delete this;
     return true;
@@ -64,22 +66,20 @@ void Kernel::Shutdown() {
 void Kernel::Loop() {
     m_bShutdown = false;
     while (!m_bShutdown) {
-        // netengine::getInstance()->DonetIO(Configmgr::getInstance()->GetCoreConfig()->sNetframetick);
+        netengine::getInstance()->DonetIO(Configmgr::getInstance()->GetCoreConfig()->sNetframetick);
         s64 tick = Timermgr::getInstance()->Dotimer();
-        if (tick > 1) {
-            ECHO("tick :%ld", tick);
+        if (tick > 10) {
+//            ECHO("tick :%ld", tick);
         }
     }
 }
 
 bool Kernel::StartTcpServer(tcore::ITcpServer * sever) {
-    //return netengine::getInstance()->AddServer(sever);
-    return false;
+    return netengine::getInstance()->AddServer(sever);
 }
 
 bool Kernel::StartTcpClient(tcore::ITcpSocket * client) {
-    //return netengine::getInstance()->AddClient(client);
-    return false;
+    return netengine::getInstance()->AddClient(client);
 }
 
 // tiemr interface 

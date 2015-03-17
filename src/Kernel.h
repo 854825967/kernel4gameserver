@@ -12,7 +12,6 @@ public:
     virtual bool Initialize();
     virtual bool Destory();
 
-
     virtual bool StartTcpServer(tcore::ITcpServer * sever);
     virtual bool StartTcpClient(tcore::ITcpSocket * client);
 

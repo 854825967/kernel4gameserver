@@ -36,7 +36,7 @@ typedef int64_t s64;
 #define THREAD_FUN unsigned int
 #define ThreadID pthread_id
 
-#define CSLEEP(n) usleep(n)
+#define CSLEEP(n) Sleep(n)
 #define SafeSprintf sprintf_s
 
 #define ECHO(format, ...) { \

@@ -83,6 +83,12 @@ SET(KERNEL_EPOLLER
     "${PROJECT_SOURCE_DIR}/src/epoller/ITcpServer.cpp"
     )
 
+SET(KERNEL_IOCPER
+    "${PROJECT_SOURCE_DIR}/src/iocper/iocper.h"
+    "${PROJECT_SOURCE_DIR}/src/iocper/iocper.cpp"
+    )
+
+
 SET(KERNEL_LOGIC_MGR
     "${PROJECT_SOURCE_DIR}/src/logicmgr/Logicmgr.h"
     "${PROJECT_SOURCE_DIR}/src/logicmgr/Logicmgr.cpp"
@@ -108,6 +114,7 @@ SOURCE_GROUP(src\\interface FILES ${KERNEL_INTERFACE})
 SOURCE_GROUP(src\\configmgr FILES ${KERNEL_CONFIG_MGR})
 SOURCE_GROUP(src\\logicmgr FILES ${KERNEL_LOGIC_MGR})
 SOURCE_GROUP(src\\timermgr FILES ${KERNEL_TIMER_MGR})
+SOURCE_GROUP(src\\iocper FILES ${KERNEL_IOCPER})
 SOURCE_GROUP(src\\epoller FILES ${KERNEL_EPOLLER})
 SOURCE_GROUP(src FILES ${KERNEL})
 
@@ -134,6 +141,7 @@ ADD_EXECUTABLE(kernel
         ${KERNEL_CONFIG_MGR}
         ${KERNEL_LOGIC_MGR}
         ${KERNEL_TIMER_MGR}
+        ${KERNEL_IOCPER}
         ${KERNEL}
         )
 ENDIF(WIN32)

@@ -19,7 +19,7 @@ namespace tcore {
     };
 
     enum eSocketStatus {
-        SS_UNINITIALIZE,
+        SS_UNINITIALIZE = 0,
         SS_ESTABLISHED,
         SS_WAITCLOSE,
     };
@@ -52,10 +52,11 @@ namespace tcore {
 
     public:
         struct sockaddr_in m_addr;
-        s32 socket_handler;
+        s64 socket_handler;
         char ip[32];
         s32 port;
         s8 m_nStatus;
+        tlib::CLockUnit m_lockAccept;
     };
 
     class ITcpSocket : public ISocket {
@@ -73,6 +74,11 @@ namespace tcore {
 
         void DoConnect(s32 flags, void * pContext);
         void DoIO(s32 flags, void * pContext);
+
+        inline void Clear() {
+            m_recvStream.clear();
+            m_sendStream.clear();
+        }
 
     public:
         tlib::TStream<BUFF_SIZE, true> m_recvStream;

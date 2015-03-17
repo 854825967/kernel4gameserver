@@ -39,20 +39,26 @@ namespace tools {
             return pStrPath;
         }
 
-        inline s64 GetTimeMicrosecond() {
+        inline s64 GetTimeMillisecond() {
 #ifdef linux
             struct timeval tv;
             gettimeofday(&tv, NULL);
-            return tv.tv_sec * 1000 * 1000 + tv.tv_usec;
+            return tv.tv_sec * 1000 + tv.tv_usec/1000;
 #endif //linux
 
-#ifdef WIN32
-            return 0;
+#ifdef WIN32    
+            SYSTEMTIME wtm;
+            GetLocalTime(&wtm);
+            struct tm tTm;
+            tTm.tm_year     = wtm.wYear - 1900;
+            tTm.tm_mon      = wtm.wMonth;
+            tTm.tm_mday     = wtm.wDay;
+            tTm.tm_hour     = wtm.wHour;
+            tTm.tm_min      = wtm.wMinute;
+            tTm.tm_sec      = wtm.wSecond;
+            tTm.tm_isdst    = -1;
+            return (s64)mktime(&tTm) * 1000 + (s64)wtm.wMilliseconds;
 #endif //WIN32
-        }
-        
-        inline s64 GetTimeMillisecond() {
-            return GetTimeMicrosecond()/1000;
         }
 
 #ifdef __cplusplus
@@ -69,6 +75,7 @@ namespace tools {
         TASSERT(value, "null point");
         return atoi(value);
     }
+
 }
 
 #endif //__Tools_h__

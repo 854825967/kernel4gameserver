@@ -32,7 +32,7 @@ void Gate::Error(IKernel * pKernel, const s8 opt, const s32 code) {
 }
 
 ITcpSocket * Gate::MallocConnection(IKernel * pKernel) {
-    ECHO("NEW CONNECTION");
+    //ECHO("NEW CONNECTION");
 
     return NEW ClientConnectSick;
 }
