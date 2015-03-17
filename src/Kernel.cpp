@@ -74,6 +74,10 @@ void Kernel::Loop() {
     }
 }
 
+IModule * Kernel::FindModule(const char * name) {
+	return Logicmgr::getInstance()->FindModule(name);
+}
+
 bool Kernel::StartTcpServer(tcore::ITcpServer * sever) {
     return netengine::getInstance()->AddServer(sever);
 }

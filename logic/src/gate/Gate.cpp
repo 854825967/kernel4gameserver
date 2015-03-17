@@ -6,6 +6,7 @@
  */
 
 #include "Gate.h"
+#include "IObjectMgr.h"
 #include "ClientConnectSick.h"
 
 bool Gate::Initialize(IKernel * pKernel) {
@@ -16,8 +17,11 @@ bool Gate::Initialize(IKernel * pKernel) {
 bool Gate::Launched(IKernel * pKernel) {
     ECHO("ready go, I'm gate");
 
-    InitAddr("0.0.0.0", 12580);
-    pKernel->StartTcpServer(this);
+	IObjectMgr * pObjectMgr = (IObjectMgr *)pKernel->FindModule("ObjectMgr");
+	pObjectMgr->TestModuleUnion();
+
+	InitAddr("0.0.0.0", 12580);
+	pKernel->StartTcpServer(this);
 
     return true;
 }

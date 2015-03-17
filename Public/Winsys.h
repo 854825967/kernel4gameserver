@@ -40,9 +40,21 @@ typedef int64_t s64;
 #define SafeSprintf sprintf_s
 
 #define ECHO(format, ...) { \
-    char log[4096] = {0}; \
-    SafeSprintf(log, 4096, "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-    printf("%s\n", log);}
+	char log[4096] = {0}; \
+	SafeSprintf(log, 4096, "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+	printf("%s\n", log);}
+
+#define ECHO_TRACE(format, ...) { \
+	char log[4096] = {0}; \
+	SafeSprintf(log, 4096, "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+	printf("%s\n", log);}
+
+#define ECHO_ERROR(format, ...) { \
+	char log[4096] = {0}; \
+	SafeSprintf(log, 4096, "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+	printf("%s\n", log);}
+
+
 
 #endif //WIN32
 

@@ -6,6 +6,7 @@ INCLUDE_DIRECTORIES(
         "${PROJECT_SOURCE_DIR}/Public"
         "${PROJECT_SOURCE_DIR}/API"
         "${PROJECT_SOURCE_DIR}/logic/src/interface"
+        "${PROJECT_SOURCE_DIR}/logic/src/define"
         )
         
 SET(GATE
@@ -23,7 +24,7 @@ SOURCE_GROUP(Public\\tinyxml FILES ${TINYXML})
 SOURCE_GROUP(Public FILES ${PUBLIC})
 SOURCE_GROUP(\\ FILES ${GATE})
 
-ADD_LIBRARY(gate SHARED
+ADD_LIBRARY(Gate SHARED
         ${GATE}
         ${API}
         ${LOGIC_DEFINE}

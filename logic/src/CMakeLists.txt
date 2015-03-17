@@ -12,10 +12,12 @@ ENDIF(WIN32)
         
 SET(LOGIC_INTERFACE
     "${PROJECT_SOURCE_DIR}/logic/src/interface/IGate.h"
+    "${PROJECT_SOURCE_DIR}/logic/src/interface/IObjectMgr.h"
     )
     
 SET(LOGIC_DEFINE
     "${PROJECT_SOURCE_DIR}/logic/src/define/ProtocolID.h"
     )
-
-ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/logic/src/gate)
+	
+ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/logic/src/Gate)
+ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/logic/src/ObjectMgr)

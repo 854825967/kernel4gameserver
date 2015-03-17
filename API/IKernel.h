@@ -4,6 +4,8 @@
 #include "MultiSys.h"
 #include "TStream.h"
 
+class IModule;
+
 namespace tcore {
 
 #define BUFF_SIZE 512
@@ -105,6 +107,8 @@ namespace tcore {
 
     class IKernel {
     public:
+		//find logic module
+		virtual IModule * FindModule(const char * name) = 0;
 
         // net interface
         virtual bool StartTcpServer(ITcpServer * sever) = 0;

@@ -12,6 +12,9 @@ public:
     virtual bool Initialize();
     virtual bool Destory();
 
+
+	virtual IModule * FindModule(const char * name);
+
     virtual bool StartTcpServer(tcore::ITcpServer * sever);
     virtual bool StartTcpClient(tcore::ITcpSocket * client);
 

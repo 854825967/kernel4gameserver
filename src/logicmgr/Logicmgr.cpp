@@ -84,25 +84,24 @@ bool Logicmgr::Initialize() {
             plogic = plogic->GetNext();
         }
 
-        {
-            vector<IModule *>::iterator vitor = m_vctModules.begin();
-            vector<IModule *>::iterator viend = m_vctModules.end();
-            while (vitor != viend) {
-                (*vitor)->Initialize(Kernel::getInstance());
-                
-                vitor ++;
-            }
-            
-            vitor = m_vctModules.begin();
-            while(vitor != viend) {
-                (*vitor)->Launched(Kernel::getInstance());
-                vitor++;
-            }
-        }
-
-
         itor++;
     }
+
+	{
+		vector<IModule *>::iterator vitor = m_vctModules.begin();
+		vector<IModule *>::iterator viend = m_vctModules.end();
+		while (vitor != viend) {
+			(*vitor)->Initialize(Kernel::getInstance());
+
+			vitor ++;
+		}
+
+		vitor = m_vctModules.begin();
+		while(vitor != viend) {
+			(*vitor)->Launched(Kernel::getInstance());
+			vitor++;
+		}
+	}
 
     return true;
 }
@@ -140,7 +139,7 @@ Logicmgr::~Logicmgr() {
 IModule * Logicmgr::FindModule(const char * pStrModuleName) {
     map<string, IModule *>::iterator itor = m_mapModules.find(pStrModuleName);
     if (itor == m_mapModules.end() || NULL == itor->second) {
-        TASSERT(false, (string("There is no LogciModule named %s") + pStrModuleName).c_str());
+        ECHO_ERROR("There is no LogciModule named %s", pStrModuleName);
         return NULL;
     }
 
