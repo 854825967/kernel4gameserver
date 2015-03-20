@@ -47,7 +47,7 @@ namespace tlib {
             m_write = 0;
             if (m_max > buff_length) {
                 if (m_pbuff != NULL) {
-                    delete m_pbuff;
+                    delete[] m_pbuff;
                     m_pbuff = NULL;
                 }
                 m_pbuff = NEW char[buff_length];
@@ -56,9 +56,9 @@ namespace tlib {
             memset(m_pbuff, 0, buff_length);
         }
 
-        const char * buff() const {
+        inline const char * buff() const {
             return &m_pbuff[m_read];
-        };
+        }
 
         void out(const s32 size) {
             STREAM_OPT_LOCK(b, m_pRlock);
@@ -71,80 +71,64 @@ namespace tlib {
             STREAM_OPT_FREELOCK(b, m_pRlock);
         }
 
-        s32 size() const {
+        inline s32 size() const {
             return m_write - m_read;
         }
 
         void in(const void * pbuff, s32 size) {
             STREAM_OPT_LOCK(b, m_pWlock);
+            s32 cursize = 0;
             if (size > m_max - m_write) {
-                s32 cursize = m_write - m_read;
+                cursize = m_write - m_read;
                 if (m_max - cursize <= size) {
-                    while (m_max - cursize < size) {
-                        malloc_double();
+                    s32 nNewSize = m_max + buff_length;
+                    while (nNewSize - cursize <= size) {
+                        nNewSize += buff_length;
                     }
+                    malloc_new_size(nNewSize);
                 } else {
                     STREAM_OPT_LOCK(b, m_pRlock);
-                    memcpy(m_pbuff, &m_pbuff[m_read], cursize);
+                    memcpy_s(m_pbuff, m_max,&m_pbuff[m_read], cursize);
                     m_write = cursize;
                     m_read = 0;
                     STREAM_OPT_FREELOCK(b, m_pRlock);
                 }
             }
 
-            memcpy(&m_pbuff[m_write], pbuff, size);
+            memcpy_s(&m_pbuff[m_write], m_max-m_write, pbuff, size);
             m_write += size;
             STREAM_OPT_FREELOCK(b, m_pWlock);
         }
 
-        void LockRead() {
+        inline void LockRead() {
             STREAM_OPT_LOCK(b, m_pRlock);
         }
 
-        void FreeRead() {
+        inline void FreeRead() {
             STREAM_OPT_FREELOCK(b, m_pRlock);
         }
 
-        void LockWrite() {
+        inline void LockWrite() {
             STREAM_OPT_LOCK(b, m_pWlock);
         }
 
-        void FreeWrite() {
+        inline void FreeWrite() {
             STREAM_OPT_FREELOCK(b, m_pWlock);
         }
 
     private:
 
-        void malloc_double() {
+        void malloc_new_size(s32 newSize) {
             STREAM_OPT_LOCK(b, m_pRlock);
             s32 cursize = m_write - m_read;
-            m_max *= 2;
+            m_max = newSize;
             char * ptemp = m_pbuff;
             m_pbuff = NEW char[m_max];
-            memcpy(m_pbuff, &ptemp[m_read], cursize);
-            delete ptemp;
+            memcpy_s(m_pbuff, m_max, &ptemp[m_read], cursize);
+            delete[] ptemp;
             m_write = cursize;
             m_read = 0;
             STREAM_OPT_FREELOCK(b, m_pRlock);
-        }
-
-        void half_free() {
-            if (m_max > buff_length) {
-                s32 cursize = m_write - m_read;
-                if (m_max > 4 * cursize) {
-                    STREAM_OPT_LOCK(b, m_pWlock);
-                    STREAM_OPT_LOCK(b, m_pRlock);
-                    m_max /= 2;
-                    char * ptemp = m_pbuff;
-                    m_pbuff = NEW char[m_max];
-                    memcpy(m_pbuff, &ptemp[m_read], cursize);
-                    delete ptemp;
-                    m_write = cursize;
-                    m_read = 0;
-                    STREAM_OPT_FREELOCK(b, m_pRlock);
-                    STREAM_OPT_FREELOCK(b, m_pWlock);
-                }
-            }
         }
 
     private:

@@ -16,8 +16,8 @@ class ClientConnectSick : public ITcpSocket {
 public:
     ClientConnectSick();
 
-    virtual void Error(IKernel * pKernel, const s8 opt, const s32 code);
-    virtual s32 Recv(IKernel * pKernel, void * context, const s32 size);
+    virtual void Error(IKernel * pKernel, const s8 opt, void * pContext, const char * debug);
+    virtual s32 Recv(IKernel * pKernel, const void * context, const s32 size);
 
     virtual void Disconnect(IKernel * pKernel);
     virtual void Connected(IKernel * pKernel);

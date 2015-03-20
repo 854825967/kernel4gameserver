@@ -15,6 +15,8 @@ struct sCoreConfig {
     //socket module
     s32 sNetThdCount; //net work thread count
     s32 sNetframetick; //net logic loop frame tick
+    s32 sNetSendSize;
+    s32 sNetRecvSize;
     
     //http module
     s32 sHttpThdCount; //http work thread count

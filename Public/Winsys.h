@@ -34,7 +34,7 @@ typedef int32_t s32;
 typedef int64_t s64;
 
 #define THREAD_FUN unsigned int
-#define ThreadID pthread_id
+#define ThreadID DWORD
 
 #define CSLEEP(n) Sleep(n)
 #define SafeSprintf sprintf_s
@@ -44,17 +44,21 @@ typedef int64_t s64;
 	SafeSprintf(log, 4096, "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
 	printf("%s\n", log);}
 
-#define ECHO_TRACE(format, ...) { \
-	char log[4096] = {0}; \
-	SafeSprintf(log, 4096, "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-	printf("%s\n", log);}
+#define ECHO_TRACE(format, ...) {\
+    char _log[4096] = {0}; \
+    SafeSprintf(_log, sizeof(_log), format, ##__VA_ARGS__); \
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN); \
+    printf("[trace]%s|%d|%s>>>%s\n", __FILE__, __LINE__, __FUNCTION__, _log); \
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_INTENSITY); \
+}
 
-#define ECHO_ERROR(format, ...) { \
-	char log[4096] = {0}; \
-	SafeSprintf(log, 4096, "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-	printf("%s\n", log);}
-
-
+#define ECHO_ERROR(format, ...) {\
+    char _log[4096] = {0}; \
+    SafeSprintf(_log, sizeof(_log), format, ##__VA_ARGS__); \
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED); \
+    printf("[error]%s|%d|%s>>>%s\n", __FILE__, __LINE__, __FUNCTION__, _log); \
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_INTENSITY); \
+}
 
 #endif //WIN32
 

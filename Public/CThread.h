@@ -4,6 +4,12 @@
 #include "MultiSys.h"
 
 namespace tlib {
+    enum {
+        THREAD_STOPED = 0,
+        THREAD_WORKING,
+        THREAD_STOPPING,
+    };
+
     class CThread
     {
     public:

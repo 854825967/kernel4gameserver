@@ -16,7 +16,7 @@ public:
     virtual bool Initialize(IKernel * pKernel);
     virtual bool Launched(IKernel * pKernel);
     virtual bool Destroy(IKernel * pKernel);
-    virtual void Error(IKernel * pKernel, const s8 opt, const s32 code);
+    virtual void Error(IKernel * pKernel, const s8 opt, void * pContext, const char * debug);
     virtual ITcpSocket * MallocConnection(IKernel * pKernel);
 };
 

@@ -10,6 +10,12 @@ namespace tools {
     extern "C" {
 #endif
 
+        inline ThreadID GetCurrentThreadID() {
+#ifdef _WIN32
+            return ::GetCurrentThreadId();
+#endif //_WIN32
+        }
+
         inline const char * GetAppPath() {
             static char * pStrPath = NULL;
 

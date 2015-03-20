@@ -71,6 +71,8 @@ bool Configmgr::LoadCoreConfig() {
     TASSERT(p != NULL, "core xml format error, can't find child netthread");
     m_oCoreConfig.sNetThdCount = tools::StringAsInt(p->Attribute("count"));
     m_oCoreConfig.sNetframetick = tools::StringAsInt(p->Attribute("frametick"));
+    m_oCoreConfig.sNetSendSize = tools::StringAsInt(p->Attribute("send_size"));
+    m_oCoreConfig.sNetRecvSize = tools::StringAsInt(p->Attribute("recv_size"));
 
     p = pRoot->FirstChildElement("httpthread");
     TASSERT(p != NULL, "core xml format error, can't find child httpthread");

@@ -45,6 +45,9 @@ namespace tlib {
         }
 
         inline void Add(type src) {
+#ifdef _DEBUG
+            s64 lTick = tools::GetTimeMillisecond();
+#endif //_DEBUG
             QUEUE_OPT_LOCK(lock, m_pWlock);
             while (m_sign[m_nWIndex] != NOT_EXISTS_DATA) {
                 CSLEEP(1);
@@ -57,9 +60,18 @@ namespace tlib {
                 m_nWIndex = 0;
             }
             QUEUE_OPT_FREELOCK(lock, m_pWlock);
+#ifdef _DEBUG
+            s64 lUse = tools::GetTimeMillisecond() - lTick;
+            if (lUse > 1) {
+                ECHO("Queue Add use tick %ld", lUse);
+            }
+#endif //_DEBUG
         }
 
         inline bool TryAdd(type src) {
+#ifdef _DEBUG
+            s64 lTick = tools::GetTimeMillisecond();
+#endif //_DEBUG
             QUEUE_OPT_LOCK(lock, m_pWlock);
             while (m_sign[m_nWIndex] != NOT_EXISTS_DATA) {
                 QUEUE_OPT_FREELOCK(lock, m_pWlock);
@@ -73,10 +85,19 @@ namespace tlib {
                 m_nWIndex = 0;
             }
             QUEUE_OPT_FREELOCK(lock, m_pWlock);
+#ifdef _DEBUG
+            s64 lUse = tools::GetTimeMillisecond() - lTick;
+            if (lUse > 1) {
+                ECHO("Queue TryAdd use tick %ld", lUse);
+            }
+#endif //_DEBUG
             return true;
         }
 
         inline bool Read(type & value) {
+#ifdef _DEBUG
+            s64 lTick = tools::GetTimeMillisecond();
+#endif //_DEBUG
             QUEUE_OPT_LOCK(lock, m_pRlock);
             while (m_sign[m_nRIndex] != EXISTS_DATA) {
                 QUEUE_OPT_FREELOCK(lock, m_pRlock);
@@ -91,6 +112,12 @@ namespace tlib {
                 m_nRIndex = 0;
             }
             QUEUE_OPT_FREELOCK(lock, m_pRlock);
+#ifdef _DEBUG
+            s64 lUse = tools::GetTimeMillisecond() - lTick;
+            if (lUse > 1) {
+                ECHO("Queue Read use tick %ld", lUse);
+            }
+#endif //_DEBUG
             return true;
         }
 

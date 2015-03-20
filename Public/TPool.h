@@ -2,6 +2,9 @@
 #define __TPool_h__
 
 #include "CLock.h"
+#ifdef _DEBUG
+#include "Tools.h"
+#endif //_DEBUG
 #include <list>
 #include <algorithm>
 using namespace std;
@@ -46,6 +49,9 @@ namespace tlib {
         }
 
         type * Create() {
+#ifdef _DEBUG
+            s64 lTick = tools::GetTimeMillisecond();
+#endif //_DEBUG
             type * p = NULL;
             POOL_OPT_LOCK(lock, m_pLock);
 #ifdef _DEBUG
@@ -67,10 +73,19 @@ namespace tlib {
             TASSERT(test == 0, "tpool has some bugs");
 #endif //_DEBUG
             POOL_OPT_FREELOCK(lock, m_pLock);
+#ifdef _DEBUG
+            s64 lUse = tools::GetTimeMillisecond() - lTick;
+            if (lUse > 5) {
+                ECHO("Pool create use tick %ld", lUse);
+            }
+#endif //_DEBUG
             return p;
         }
 
         bool Recover(type * pUnit) {
+#ifdef _DEBUG
+            s64 lTick = tools::GetTimeMillisecond();
+#endif //_DEBUG
             if (!CheckAddr(pUnit)) {
                 TASSERT(false, "point adress error");
                 return false;
@@ -97,6 +112,12 @@ namespace tlib {
             TASSERT(test == 0, "tpool has some bugs");
 #endif //_DEBUG
             POOL_OPT_FREELOCK(lock, m_pLock);
+#ifdef _DEBUG
+            s64 lUse = tools::GetTimeMillisecond() - lTick;
+            if (lUse > 5) {
+                ECHO("Pool Recover use tick %ld", lUse);
+            }
+#endif //_DEBUG
             return true;
         }
     private:

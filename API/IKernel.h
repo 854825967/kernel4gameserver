@@ -6,18 +6,23 @@
 
 class IModule;
 
+#ifdef _WIN32
+struct iocp_event;
+#endif //_WIN32
+
 namespace tcore {
 
-#define BUFF_SIZE 512
+#define BUFF_SIZE (16 * 1024)
     class IKernel;
 
     enum eSocketOpt {
         SO_ACCEPT,
-        SO_TCPIO,
+        SO_TCPRECV,
+        SO_TCPSEND,
         SO_CONNECT,
 
         //FOR UDP
-        SO_UDPIO,
+        //SO_UDPIO,
     };
 
     enum eSocketStatus {
@@ -30,11 +35,17 @@ namespace tcore {
     public:
 
         ISocket() {
-            socket_handler = -1;
-            m_nStatus = SS_UNINITIALIZE;
+            Clear();
         }
 
-        virtual void Error(IKernel * pKernel, const s8 opt, const s32 code) = 0; //code:0=success
+        void Clear() {
+            socket_handler = -1;
+            m_nStatus = SS_UNINITIALIZE;
+            m_bRecvPending = false;
+            m_bSendPending = false;
+        }
+
+        virtual void Error(IKernel * pKernel, const s8 opt, void * pContext, const char * debug) = 0; //code:0=success
 
         inline void InitAddr(const char * _ip, const s32 _port) {
             memset(ip, 0, sizeof (ip));
@@ -59,11 +70,16 @@ namespace tcore {
         s32 port;
         s8 m_nStatus;
         tlib::CLockUnit m_lockAccept;
+
+#ifdef _WIN32
+        bool m_bRecvPending;
+        bool m_bSendPending;
+#endif //_WIN32
     };
 
     class ITcpSocket : public ISocket {
     public:
-        virtual s32 Recv(IKernel * pKernel, void * context, const s32 size) = 0; // return size that u use;
+        virtual s32 Recv(IKernel * pKernel, const void * context, const s32 size) = 0; // return size that u use;
 
         virtual void Disconnect(IKernel * pKernel) = 0;
         virtual void Connected(IKernel * pKernel) = 0;
@@ -75,12 +91,20 @@ namespace tcore {
         }
 
         void DoConnect(s32 flags, void * pContext);
+
+#ifdef linux
         void DoIO(s32 flags, void * pContext);
+#endif //linux
 
         inline void Clear() {
             m_recvStream.clear();
             m_sendStream.clear();
         }
+
+#ifdef WIN32
+        bool DoRecv(iocp_event * pEvent, HANDLE hCompletionPort);
+        bool DoSend(iocp_event * pEvent, HANDLE hCompletionPort);
+#endif //WIN32
 
     public:
         tlib::TStream<BUFF_SIZE, true> m_recvStream;

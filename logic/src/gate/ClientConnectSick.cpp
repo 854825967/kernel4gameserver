@@ -14,19 +14,20 @@ ClientConnectSick::ClientConnectSick() {
 
 }
 
-void ClientConnectSick::Error(IKernel * pKernel, const s8 opt, const s32 code) {
-    //ECHO("opt %d, error %d", opt, code);
+void ClientConnectSick::Error(IKernel * pKernel, const s8 opt, void * pContext, const char * debug) {
+    //ECHO_ERROR(debug);
 }
 
-s32 ClientConnectSick::Recv(IKernel * pKernel, void * context, const s32 size) {
-    //ECHO("%s", (const char *) context);
-    Close();
+s32 ClientConnectSick::Recv(IKernel * pKernel, const void * context, const s32 size) {
+    ECHO("size %d", size);
+    Send(context, size);
     return size;
 }
 
 void ClientConnectSick::Disconnect(IKernel * pKernel) {
     i --;
-    //ECHO("connection Disconnect, connection count : %d", i);
+    ECHO_TRACE("connection Disconnect, connection count : %d", i);
+    delete this;
 }
 
 void ClientConnectSick::Connected(IKernel * pKernel) {

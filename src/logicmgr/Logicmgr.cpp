@@ -50,7 +50,6 @@ bool Logicmgr::Initialize() {
         SafeSprintf(path, sizeof (path), "%s/%s/lib%s.so",
                 tools::GetAppPath(), pConfig->strModulePath.c_str(), (*itor).c_str());
 
-        ECHO("module path : %s", path);
         void * handle = dlopen(path, RTLD_LAZY);
         TASSERT(handle, "open %s error", path);
 
@@ -62,7 +61,6 @@ bool Logicmgr::Initialize() {
         SafeSprintf(path, sizeof (path), "%s/%s/%s.dll",
             tools::GetAppPath(), pConfig->strModulePath.c_str(), (*itor).c_str());
 
-        ECHO("module path : %s", path);
         HINSTANCE hinst = ::LoadLibrary(path);
         GetModuleFun fun = (GetModuleFun)::GetProcAddress(hinst, NAME_OF_GET_LOGIC_FUN);
         TASSERT(fun, "get function:GetLogicModule error");
