@@ -18,8 +18,8 @@ public:
     virtual bool Initialize();
     virtual bool Destory();
 
-    virtual const sCoreConfig * GetCoreConfig();
-    virtual const sModuleConfig * GetModuleConfig();
+    virtual inline const sCoreConfig * GetCoreConfig();
+    virtual inline const sModuleConfig * GetModuleConfig();
 private:
     bool LoadCoreConfig();
     bool LoadModuleConfig();

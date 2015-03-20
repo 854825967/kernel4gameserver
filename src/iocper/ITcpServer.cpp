@@ -24,7 +24,7 @@ namespace tcore {
         s32 res = g_pFunAcceptEx(
             socket_handler,
             pEvent->socket,
-            pEvent->buff,
+            pEvent->pBuff,
             0,
             sizeof(struct sockaddr_in) + 16,
             sizeof(struct sockaddr_in) + 16,
@@ -37,7 +37,7 @@ namespace tcore {
             shutdown(socket_handler, SD_BOTH);
             closesocket(socket_handler);
             g_poolIocpevent.Recover(pEvent);
-            //TASSERT(false, "AcceptEx error %d", err);
+            TASSERT(false, "AcceptEx error %d", err);
             return;
         }
     }
@@ -48,19 +48,20 @@ namespace tcore {
     }
 
     bool ITcpSocket::DoRecv(iocp_event * pEvent, HANDLE hCompletionPort) {
-        TASSERT(pEvent && hCompletionPort && m_nStatus ==SS_ESTABLISHED, "r u joking me");
         formartIocpevent(pEvent, this, socket_handler, SO_TCPRECV);
-        SetLastError(0);
-        if (SOCKET_ERROR == WSARecv(pEvent->socket, &pEvent->wbuf, 1, &pEvent->dwBytes, &pEvent->dwFlags, (LPWSAOVERLAPPED)pEvent, NULL)) {
-            pEvent->code = GetLastError();
-            if (ERROR_IO_PENDING != pEvent->code) {
-                shutdown(socket_handler, SD_BOTH);
-                closesocket(socket_handler);
-                m_bRecvPending = false;
-                return false;
+        if (m_nStatus == SS_ESTABLISHED) {
+            TASSERT(pEvent && hCompletionPort && m_nStatus ==SS_ESTABLISHED, "r u joking me");
+            SetLastError(0);
+            if (SOCKET_ERROR == WSARecv(pEvent->socket, &pEvent->wbuf, 1, &pEvent->dwBytes, &pEvent->dwFlags, (LPWSAOVERLAPPED)pEvent, NULL)) {
+                pEvent->code = GetLastError();
+                if (ERROR_IO_PENDING != pEvent->code) {
+                    return false;
+                }
             }
+            return true;
+        } else {
+            return false;
         }
-        m_bRecvPending = true;
         return true;
     }
 
@@ -70,38 +71,26 @@ namespace tcore {
         formartIocpevent(pEvent, this, socket_handler, SO_TCPSEND);
         if (0 == m_sendStream.size()) {
             if (m_nStatus == SS_WAITCLOSE) {
-                shutdown(socket_handler, SD_BOTH);
-                closesocket(socket_handler);
-                m_bSendPending = false;
                 return false;
             }
 
             if (!PostQueuedCompletionStatus(hCompletionPort, 0, socket_handler, (LPWSAOVERLAPPED)pEvent)) {
                 // some error must be deal.
-                shutdown(socket_handler, SD_BOTH);
-                closesocket(socket_handler);
-                m_bSendPending = false;
                 TASSERT(false, "PostQueuedCompletionStatus error %d", ::GetLastError());
                 return false;
             } 
-
         } else {
-
             m_sendStream.LockWrite();
             pEvent->wbuf.buf = (char *)m_sendStream.buff();
-            pEvent->wbuf.len = m_sendStream.size();
+            pEvent->wbuf.len = (m_sendStream.size()>=Configmgr::getInstance()->GetCoreConfig()->sNetSendSize)?(Configmgr::getInstance()->GetCoreConfig()->sNetSendSize):(m_sendStream.size());
             s32 res = WSASend(socket_handler, &pEvent->wbuf, 1, NULL, 0, (LPWSAOVERLAPPED)pEvent, NULL);
             m_sendStream.FreeWrite();
 
             if (SOCKET_ERROR == res && WSA_IO_PENDING == (pEvent->code = WSAGetLastError()) ) {
-                shutdown(socket_handler, SD_BOTH);
-                closesocket(socket_handler);
-                m_bSendPending = false;
                 return false;
             }
         }
 
-        m_bSendPending = true;
         return true;
     }
 }

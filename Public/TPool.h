@@ -37,7 +37,6 @@ namespace tlib {
 
         ~TPool() {
             for (s32 i = 0; i < m_sBlockCount; i++) {
-                ECHO("i %d", i);
                 delete[] m_pUnitAry[i];
             }
 
@@ -129,7 +128,7 @@ namespace tlib {
                 m_pUnitAry = NEW type*;
             } else {
                 type ** p = NEW type*[m_sBlockCount + 1];
-                memcpy(p, m_pUnitAry, m_sBlockCount * sizeof (type *));
+                memcpy_s(p, (m_sBlockCount + 1) * sizeof(type *),m_pUnitAry, m_sBlockCount * sizeof (type *));
                 delete[] m_pUnitAry;
                 m_pUnitAry = p;
             }

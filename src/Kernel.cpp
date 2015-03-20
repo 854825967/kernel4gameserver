@@ -68,6 +68,7 @@ void Kernel::Loop() {
     while (!m_bShutdown) {
         netengine::getInstance()->DonetIO(Configmgr::getInstance()->GetCoreConfig()->sNetframetick);
         s64 tick = Timermgr::getInstance()->Dotimer();
+        //Httpmgr::getInstance()->DoHttp();
         if (tick > 10) {
 //            ECHO("tick :%ld", tick);
         }

@@ -1,6 +1,7 @@
 #include "iocphead.h"
 
 tlib::TPool<iocp_event, true> g_poolIocpevent;
+CLockUnit g_lock;
 
 // async connect and accept api address
 LPFN_ACCEPTEX g_pFunAcceptEx = NULL;
@@ -42,9 +43,10 @@ LPFN_CONNECTEX GetConnectExFun() {
 
 void formartIocpevent(struct iocp_event * & pEvent, ISocket * p,
                              const s64 socket, const s8 event) {
-                                 memset(pEvent, 0, sizeof(struct iocp_event));
-                                 pEvent->wbuf.buf = pEvent->buff;
-                                 pEvent->wbuf.len = sizeof(pEvent->buff);
+                                 //memset(pEvent, 0, sizeof(struct iocp_event));
+                                 pEvent->clear();
+                                 pEvent->wbuf.buf = pEvent->pBuff;
+                                 pEvent->wbuf.len = pEvent->buffLen;
                                  pEvent->socket = socket;
                                  pEvent->pContext = p;
                                  pEvent->opt = event;

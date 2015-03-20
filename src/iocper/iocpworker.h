@@ -3,8 +3,10 @@
 
 #include "iocphead.h"
 #include "CThread.h"
+#include "CHashMap.h"
 
 class iocpworker : public CThread {
+    typedef CHashMap<s64, ISocket *> SOCKET_CLIENT_RELATION;
 public:
     iocpworker() : m_hCompletionPort(NULL) {
 
@@ -29,9 +31,16 @@ public:
     s64 DealEvent(s64 overtime);
 
 private:
+    void SendDisconnectEvent(struct iocp_event * & pEvent);
+
+    void RelateSocketClient(const s64 socket, ISocket * pClient);
+    bool CheckSocketClient(const s64 socket);
+
+private:
     HANDLE m_hCompletionPort;
     s8 m_nStatus;
     tlib::TQueue<struct iocp_event *, false, 4096> m_queueEvent;
+    SOCKET_CLIENT_RELATION m_mapSocketClient;
 };
 
 #endif //__iocpworker_h__

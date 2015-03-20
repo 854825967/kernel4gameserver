@@ -248,8 +248,8 @@ void iocper::CompletedAccept() {
     } 
 
     client->socket_handler = pEvent->socket;
-    client->Connected(Kernel::getInstance());
     client->m_nStatus = SS_ESTABLISHED;
+    client->Connected(Kernel::getInstance());
     TASSERT(pEvent, "wtf");;
     pEvent->pContext = client;
     formartIocpevent(pEvent, client, socket_handler, SO_ACCEPT);

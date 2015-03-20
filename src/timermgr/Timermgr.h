@@ -22,7 +22,7 @@ public:
     }
     
     timer_index & operator=(const timer_index & index) {
-        memcpy(this, &index, sizeof(*this));
+        memcpy_s(this, sizeof(*this), &index, sizeof(*this));
         return *this;
     }
 

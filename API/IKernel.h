@@ -41,8 +41,6 @@ namespace tcore {
         void Clear() {
             socket_handler = -1;
             m_nStatus = SS_UNINITIALIZE;
-            m_bRecvPending = false;
-            m_bSendPending = false;
         }
 
         virtual void Error(IKernel * pKernel, const s8 opt, void * pContext, const char * debug) = 0; //code:0=success
@@ -70,11 +68,6 @@ namespace tcore {
         s32 port;
         s8 m_nStatus;
         tlib::CLockUnit m_lockAccept;
-
-#ifdef _WIN32
-        bool m_bRecvPending;
-        bool m_bSendPending;
-#endif //_WIN32
     };
 
     class ITcpSocket : public ISocket {

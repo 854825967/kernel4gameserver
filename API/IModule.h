@@ -31,7 +31,7 @@ public:
     }
 
     bool SetName(const char * pName) {
-        memcpy(m_pName, pName, MODULE_NAME_LENGTH - 1);
+        memcpy_s(m_pName, sizeof(m_pName), pName, MODULE_NAME_LENGTH - 1);
         return true;
     }
 

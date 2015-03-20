@@ -44,11 +44,11 @@ bool Configmgr::Destory() {
     return true;
 }
 
-const sCoreConfig * Configmgr::GetCoreConfig() {
+inline const sCoreConfig * Configmgr::GetCoreConfig() {
     return &m_oCoreConfig;
 }
 
-const sModuleConfig * Configmgr::GetModuleConfig() {
+inline const sModuleConfig * Configmgr::GetModuleConfig() {
     return &m_oModuleConfig;
 }
 
