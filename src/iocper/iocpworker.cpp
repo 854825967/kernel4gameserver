@@ -57,8 +57,7 @@ bool iocpworker::CheckSocketClient(const s64 socket) {
 
 void iocpworker::SendDisconnectEvent(struct iocp_event * & pEvent) {
     SOCKET_CLIENT_RELATION::iterator itor = m_mapSocketClient.find(pEvent->socket);
-    if (itor != m_mapSocketClient.end()) {
-        TASSERT(itor->second == pEvent->pContext, "wtf");
+    if (itor != m_mapSocketClient.end() && itor->second == pEvent->pContext) {
         closesocket(pEvent->socket);
         pEvent->dwBytes = 0;
         pEvent->code = -1;

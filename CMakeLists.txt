@@ -44,6 +44,7 @@ SET(PUBLIC
     "${PROJECT_SOURCE_DIR}/Public/CRand.h"
     "${PROJECT_SOURCE_DIR}/Public/CThread.h"
     "${PROJECT_SOURCE_DIR}/Public/CThread.cpp"
+    "${PROJECT_SOURCE_DIR}/Public/CHashMap.h"
     "${PROJECT_SOURCE_DIR}/Public/Linux.h"
     "${PROJECT_SOURCE_DIR}/Public/Winsys.h"
     "${PROJECT_SOURCE_DIR}/Public/MultiSys.h"
@@ -86,6 +87,11 @@ SET(KERNEL_EPOLLER
 SET(KERNEL_IOCPER
     "${PROJECT_SOURCE_DIR}/src/iocper/iocper.h"
     "${PROJECT_SOURCE_DIR}/src/iocper/iocper.cpp"
+    "${PROJECT_SOURCE_DIR}/src/iocper/iocpworker.h"
+    "${PROJECT_SOURCE_DIR}/src/iocper/iocpworker.cpp"
+    "${PROJECT_SOURCE_DIR}/src/iocper/iocphead.h"
+    "${PROJECT_SOURCE_DIR}/src/iocper/iocphead.cpp"
+    "${PROJECT_SOURCE_DIR}/src/iocper/ITcpServer.cpp"
     )
 
 

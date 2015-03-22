@@ -50,7 +50,7 @@ namespace tcore {
     bool ITcpSocket::DoRecv(iocp_event * pEvent, HANDLE hCompletionPort) {
         formartIocpevent(pEvent, this, socket_handler, SO_TCPRECV);
         if (m_nStatus == SS_ESTABLISHED) {
-            TASSERT(pEvent && hCompletionPort && m_nStatus ==SS_ESTABLISHED, "r u joking me");
+            TASSERT(pEvent && hCompletionPort, "r u joking me");
             SetLastError(0);
             if (SOCKET_ERROR == WSARecv(pEvent->socket, &pEvent->wbuf, 1, &pEvent->dwBytes, &pEvent->dwFlags, (LPWSAOVERLAPPED)pEvent, NULL)) {
                 pEvent->code = GetLastError();
