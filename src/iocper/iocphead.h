@@ -14,6 +14,7 @@ struct iocp_event {
         buffLen = Configmgr::getInstance()->GetCoreConfig()->sNetRecvSize;
         pBuff = NEW char[buffLen];
         TASSERT(pBuff, "wtf");
+        clear();
     }
 
     void clear() {

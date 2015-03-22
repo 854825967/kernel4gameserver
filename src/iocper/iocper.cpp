@@ -98,7 +98,7 @@ bool iocper::AddServer(tcore::ITcpServer * server) {
         TASSERT(false, "bind error %d", ::GetLastError());
         return false;
     }
-    if (listen(server->socket_handler, 256) == SOCKET_ERROR) {
+    if (listen(server->socket_handler, 2048) == SOCKET_ERROR) {
         closesocket(server->socket_handler);
         TASSERT(false, "listen error %d", ::GetLastError());
         return false;
@@ -116,66 +116,64 @@ bool iocper::AddServer(tcore::ITcpServer * server) {
 }
 
 bool iocper::AddClient(tcore::ITcpSocket * client) {
-//     SetLastError(0);
-//     client->socket_handler = INVALID_SOCKET;
-// 
-//     if (INVALID_SOCKET == (client->socket_handler = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED)) ) {
-//         TASSERT(false, "WSASocket error %d", ::GetLastError());
-//         return false;
-//     }
-// 
-//     memset(&client->m_addr, 0, sizeof(client->m_addr));
-//     client->m_addr.sin_family = AF_INET;
-//     if (SOCKET_ERROR == bind(client->socket_handler, (struct sockaddr *)&client->m_addr, sizeof(struct sockaddr_in))) {
-//         closesocket(client->socket_handler);
-//         TASSERT(false, "ConnectEx bind error %d", ::GetLastError());
-//         return false;
-//     }
-// 
-//     DWORD dwValue = 0;
-//     if (SOCKET_ERROR == ioctlsocket(client->socket_handler, FIONBIO, &dwValue)) {
-//         closesocket(client->socket_handler);
-//         TASSERT(false, "ConnectEx ioctlsocket error %d", ::GetLastError());
-//         return false;
-//     }
-// 
-//     if (m_hCompletionPort != CreateIoCompletionPort((HANDLE)client->socket_handler, m_hCompletionPort, (u_long)client->socket_handler, 0)) {
-//         closesocket(client->socket_handler);
-//         TASSERT(false, "CreateIoCompletionPort error %d", ::GetLastError());
-//         return false;
-//     }
-// 
-//     struct iocp_event * pEvent = g_poolIocpevent.Create();
-//     memset(pEvent, 0, sizeof(*pEvent));
-//     pEvent->p = client;
-//     pEvent->event = SO_CONNECT;
-//     client->m_addr.sin_family = AF_INET;
-//     client->m_addr.sin_port = htons(client->port);
-//     if((client->m_addr.sin_addr.s_addr = inet_addr(client->ip)) == INADDR_NONE) {
-//         closesocket(client->socket_handler);
-//         g_poolIocpevent.Recover(pEvent);
-//         TASSERT(false, "inet_addr error %d", ::GetLastError());
-//         return false;
-//     }
-// 
-// 
-//     s32 res = g_pFunConnectEx(
-//         client->socket_handler,
-//         (struct sockaddr *)&client->m_addr,
-//         sizeof(struct sockaddr_in),
-//         NULL,
-//         0,
-//         &pEvent->dwBytes,
-//         (LPOVERLAPPED)pEvent
-//         );
-// 
-//     s32 err = WSAGetLastError();
-//     if (res == FALSE && err != WSA_IO_PENDING) {
-//         closesocket(client->socket_handler);
-//         g_poolIocpevent.Recover(pEvent);
-//         TASSERT(false, "ConnectEx error %d", err);
-//         return false;
-//     }
+    SetLastError(0);
+    client->socket_handler = INVALID_SOCKET;
+
+    if (INVALID_SOCKET == (client->socket_handler = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED)) ) {
+        TASSERT(false, "WSASocket error %d", ::GetLastError());
+        return false;
+    }
+
+    memset(&client->m_addr, 0, sizeof(client->m_addr));
+    client->m_addr.sin_family = AF_INET;
+    if (SOCKET_ERROR == bind(client->socket_handler, (struct sockaddr *)&client->m_addr, sizeof(struct sockaddr_in))) {
+        closesocket(client->socket_handler);
+        TASSERT(false, "ConnectEx bind error %d", ::GetLastError());
+        return false;
+    }
+
+    DWORD dwValue = 0;
+    if (SOCKET_ERROR == ioctlsocket(client->socket_handler, FIONBIO, &dwValue)) {
+        closesocket(client->socket_handler);
+        TASSERT(false, "ConnectEx ioctlsocket error %d", ::GetLastError());
+        return false;
+    }
+
+    HANDLE hCompletionPort = BalancingCompletionPort();
+    if (hCompletionPort != CreateIoCompletionPort((HANDLE)client->socket_handler, hCompletionPort, (u_long)client->socket_handler, 0)) {
+        closesocket(client->socket_handler);
+        TASSERT(false, "CreateIoCompletionPort error %d", ::GetLastError());
+        return false;
+    }
+
+    struct iocp_event * pEvent = g_poolIocpevent.Create();
+    formartIocpevent(pEvent, client, client->socket_handler, SO_CONNECT);
+    client->m_addr.sin_family = AF_INET;
+    client->m_addr.sin_port = htons(client->port);
+    if((client->m_addr.sin_addr.s_addr = inet_addr(client->ip)) == INADDR_NONE) {
+        closesocket(client->socket_handler);
+        g_poolIocpevent.Recover(pEvent);
+        TASSERT(false, "inet_addr error %d", ::GetLastError());
+        return false;
+    }
+
+    s32 res = g_pFunConnectEx(
+        client->socket_handler,
+        (struct sockaddr *)&client->m_addr,
+        sizeof(struct sockaddr_in),
+        NULL,
+        0,
+        &pEvent->dwBytes,
+        (LPOVERLAPPED)pEvent
+        );
+
+    s32 err = WSAGetLastError();
+    if (res == FALSE && err != WSA_IO_PENDING) {
+        closesocket(client->socket_handler);
+        g_poolIocpevent.Recover(pEvent);
+        TASSERT(false, "ConnectEx error %d", err);
+        return false;
+    }
 
     return true;
 }
@@ -248,8 +246,6 @@ void iocper::CompletedAccept() {
     } 
 
     client->socket_handler = pEvent->socket;
-    client->m_nStatus = SS_ESTABLISHED;
-    client->Connected(Kernel::getInstance());
     TASSERT(pEvent, "wtf");;
     pEvent->pContext = client;
     formartIocpevent(pEvent, client, socket_handler, SO_ACCEPT);
@@ -261,6 +257,8 @@ void iocper::CompletedAccept() {
         TASSERT(false, "PostQueuedCompletionStatus error %d", ::GetLastError());
         return;
     }
+    client->m_nStatus = SS_ESTABLISHED;
+    client->Connected(Kernel::getInstance());
 }
 
 s64 iocper::DonetIO(s64 overtime) {

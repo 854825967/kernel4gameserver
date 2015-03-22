@@ -10,6 +10,30 @@ s64 iocpworker::DealEvent(s64 overtime) {
             TASSERT(pEvent, "wtf");
 
             switch (pEvent->opt) {
+            case SO_CONNECT:
+                {
+                    ITcpSocket * client = (ITcpSocket *) pEvent->pContext;
+                    if (ERROR_SUCCESS == pEvent->code) {
+                        client->socket_handler = pEvent->socket;
+                        TASSERT(pEvent, "wtf");;
+                        pEvent->pContext = client;
+                        formartIocpevent(pEvent, client, client->socket_handler, SO_ACCEPT);
+                        if (!PostQueuedCompletionStatus(m_hCompletionPort, 0, client->socket_handler, (LPWSAOVERLAPPED)pEvent)) {
+                            // some error must be deal.
+                            shutdown(client->socket_handler, SD_BOTH);
+                            closesocket(client->socket_handler);
+                            g_poolIocpevent.Recover(pEvent);
+                            TASSERT(false, "PostQueuedCompletionStatus error %d", ::GetLastError());
+                            client->Error(Kernel::getInstance(), SO_CONNECT, NULL, "connect error");
+                            break;
+                        }
+                        client->m_nStatus = SS_ESTABLISHED;
+                        client->Connected(Kernel::getInstance());
+                    } else {
+                        client->Error(Kernel::getInstance(), SO_CONNECT, NULL, "connect error");
+                    }
+                    break;
+                }
             case SO_TCPRECV:
                 {
                     ITcpSocket * client = (ITcpSocket *) pEvent->pContext;
@@ -99,6 +123,11 @@ void iocpworker::Run() {
         }
         
         switch (pEvent->opt) {
+        case SO_CONNECT:
+            {
+                m_queueEvent.Add(pEvent);
+                break;
+            }
         case SO_ACCEPT:
             {
                 ITcpSocket * pClient = (ITcpSocket *)pEvent->pContext;
@@ -112,7 +141,7 @@ void iocpworker::Run() {
                 struct iocp_event * pSEvent = g_poolIocpevent.Create();
                 TASSERT(pSEvent, "wtf");
                 if (!pClient->DoSend(pSEvent, m_hCompletionPort)) {
-                    SendDisconnectEvent(pEvent);
+                    SendDisconnectEvent(pSEvent);
                 }
                 break;
             }

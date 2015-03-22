@@ -38,7 +38,6 @@ namespace tcore {
             closesocket(socket_handler);
             g_poolIocpevent.Recover(pEvent);
             TASSERT(false, "AcceptEx error %d", err);
-            return;
         }
     }
 

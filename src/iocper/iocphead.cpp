@@ -43,7 +43,6 @@ LPFN_CONNECTEX GetConnectExFun() {
 
 void formartIocpevent(struct iocp_event * & pEvent, ISocket * p,
                              const s64 socket, const s8 event) {
-                                 //memset(pEvent, 0, sizeof(struct iocp_event));
                                  pEvent->clear();
                                  pEvent->wbuf.buf = pEvent->pBuff;
                                  pEvent->wbuf.len = pEvent->buffLen;
