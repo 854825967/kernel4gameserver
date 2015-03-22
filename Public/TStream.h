@@ -3,6 +3,7 @@
 
 #include "MultiSys.h"
 #include "CLock.h"
+#include "Tools.h"
 #include <string.h>
 
 #define STREAM_OPT_LOCK(b, lock) \
@@ -88,14 +89,14 @@ namespace tlib {
                     malloc_new_size(nNewSize);
                 } else {
                     STREAM_OPT_LOCK(b, m_pRlock);
-                    memcpy_s(m_pbuff, m_max,&m_pbuff[m_read], cursize);
+                    tools::SafeMemcpy(m_pbuff, m_max,&m_pbuff[m_read], cursize);
                     m_write = cursize;
                     m_read = 0;
                     STREAM_OPT_FREELOCK(b, m_pRlock);
                 }
             }
 
-            memcpy_s(&m_pbuff[m_write], m_max-m_write, pbuff, size);
+            tools::SafeMemcpy(&m_pbuff[m_write], m_max-m_write, pbuff, size);
             m_write += size;
             STREAM_OPT_FREELOCK(b, m_pWlock);
         }
@@ -124,7 +125,7 @@ namespace tlib {
             m_max = newSize;
             char * ptemp = m_pbuff;
             m_pbuff = NEW char[m_max];
-            memcpy_s(m_pbuff, m_max, &ptemp[m_read], cursize);
+            tools::SafeMemcpy(m_pbuff, m_max, &ptemp[m_read], cursize);
             delete[] ptemp;
             m_write = cursize;
             m_read = 0;

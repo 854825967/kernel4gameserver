@@ -5,8 +5,8 @@
 INCLUDE_DIRECTORIES(
         "${PROJECT_SOURCE_DIR}/Public"
         "${PROJECT_SOURCE_DIR}/API"
-        "${PROJECT_SOURCE_DIR}/logic/src/interface"
-        "${PROJECT_SOURCE_DIR}/logic/src/define"
+        "${PROJECT_SOURCE_DIR}/logic/src/Interface"
+        "${PROJECT_SOURCE_DIR}/logic/src/Define"
         )
         
 SET(GATE

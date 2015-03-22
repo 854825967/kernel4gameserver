@@ -22,7 +22,7 @@ public:
     }
     
     timer_index & operator=(const timer_index & index) {
-        memcpy_s(this, sizeof(*this), &index, sizeof(*this));
+        tools::SafeMemcpy(this, sizeof(*this), &index, sizeof(*this));
         return *this;
     }
 

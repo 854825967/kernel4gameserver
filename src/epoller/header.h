@@ -14,14 +14,7 @@
 #define SEND_BUFF_LEN 4096
 #define EPOLL_DESC_COUNT 4096
 #define EPOLLER_EVENTS_COUNT 512
-#define EPOLLER_DATA_COUNT 4096 
-
-enum {
-    THREAD_STOPED = 0,
-    THREAD_WORKING,
-    THREAD_STOPPING,
-};
-
+#define EPOLLER_DATA_COUNT 4096
 
 #ifdef __cplusplus
 extern "C" {

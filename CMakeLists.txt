@@ -5,13 +5,12 @@
 cmake_minimum_required(VERSION 2.8)
 
 PROJECT(T-Kernel)
-#÷∏∂®±‡“Î∆˜
-IF(LINUX)
+IF(UNIX)
     SET(CMAKE_CXX_FLAGS "-g -std=c++0x -Wall -lpthread -rdynamic -ldl -Dlinux -D_DEBUG")
     SET(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++0x -lpthread -rdynamic -ldl -Dlinux -D_DEBUG")
     SET(CMAKE_CXX_FLAGS_RELEASE "-g -std=c++0x -lpthread -rdynamic -ldl -Dlinux")
     MESSAGE(STATUS "Linux")
-ENDIF(LINUX)
+ENDIF(UNIX)
 
 IF(WIN32)
     SET(CMAKE_C_FLAGS_DEBUG_INIT "/D_DEBUG /Zm8192000 /MTd /Zi /Ob0 /Od /RTC1") 
@@ -124,7 +123,7 @@ SOURCE_GROUP(src\\iocper FILES ${KERNEL_IOCPER})
 SOURCE_GROUP(src\\epoller FILES ${KERNEL_EPOLLER})
 SOURCE_GROUP(src FILES ${KERNEL})
 
-IF(LINUX)
+IF(UNIX)
 ADD_EXECUTABLE(kernel
         ${API}
         ${TINYXML}
@@ -136,7 +135,7 @@ ADD_EXECUTABLE(kernel
         ${KERNEL_EPOLLER}
         ${KERNEL}
         )
-ENDIF(LINUX)
+ENDIF(UNIX)
 
 IF(WIN32)
 ADD_EXECUTABLE(kernel
@@ -151,9 +150,9 @@ ADD_EXECUTABLE(kernel
         ${KERNEL}
         )
 ENDIF(WIN32)
-IF(LINUX)
+IF(UNIX)
 SET(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build/linux")
-ENDIF(LINUX)
+ENDIF(UNIX)
 
 IF(WIN32)
 SET(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build/windows")

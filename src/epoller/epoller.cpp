@@ -114,17 +114,15 @@ bool epoller::AddServer(ITcpServer * server) {
 
     if (bind(server->socket_handler, (sockaddr *) & server->m_addr, sizeof (server->m_addr)) != 0) {
         ECHO("add server error : %s", strerror(errno));
-        server->Error(Kernel::getInstance(), SO_ACCEPT, errno);
         shut_socket(server->socket_handler);
-        server->socket_handler = 0;
+        server->socket_handler = -1;
         return false;
     }
 
     if (listen(server->socket_handler, 4096) != 0) {
         ECHO("add server error : %s", strerror(errno));
-        server->Error(Kernel::getInstance(), SO_ACCEPT, errno);
         shut_socket(server->socket_handler);
-        server->socket_handler = 0;
+        server->socket_handler = -1;
         return false;
     }
 
@@ -165,9 +163,8 @@ bool epoller::AddClient(ITcpSocket * client) {
 
     s32 ret = connect(client->socket_handler, (struct sockaddr *) &client->m_addr, sizeof (client->m_addr));
     if (ret == 0) {
-        client->Error(Kernel::getInstance(), SO_CONNECT, 0);
+        //client->Error(Kernel::getInstance(), SO_CONNECT, "");
     } else if (ret < 0 && errno != EINPROGRESS) {
-        client->Error(Kernel::getInstance(), SO_CONNECT, errno);
         ECHO("connect error %s", strerror(errno));
         return false;
     } else {
@@ -214,10 +211,10 @@ s64 epoller::DonetIO(s64 overtime) {
                     g_EpollerDataPool.Recover(p);
                     break;
                 }
-                case SO_TCPIO:
+                case SO_TCPRECV:
                 {
                     ITcpSocket * client = (ITcpSocket *) p->user_ptr;
-                    client->Error(Kernel::getInstance(), p->opt, p->code);
+                    //client->Error(Kernel::getInstance(), );
                     if (p->code != -1 && p->len != 0) {
                         s32 use_size;
                         client->m_recvStream.LockRead();

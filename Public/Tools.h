@@ -9,11 +9,19 @@ namespace tools {
 #ifdef __cplusplus
     extern "C" {
 #endif
+        inline void SafeMemcpy(void *__restrict __dest, size_t __max, __const void *__restrict __src, size_t __n) {
+            TASSERT(__n <= __max, "over flow");
+            memcpy(__dest, __src, (__max>=__n)?(__n):(__max));
+        }
 
         inline ThreadID GetCurrentThreadID() {
 #ifdef _WIN32
             return ::GetCurrentThreadId();
 #endif //_WIN32
+            
+#ifdef linux
+            pthread_self();
+#endif linux
         }
 
         inline const char * GetAppPath() {

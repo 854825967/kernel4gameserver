@@ -2,9 +2,7 @@
 #define __TPool_h__
 
 #include "CLock.h"
-#ifdef _DEBUG
 #include "Tools.h"
-#endif //_DEBUG
 #include <list>
 #include <algorithm>
 using namespace std;
@@ -128,7 +126,7 @@ namespace tlib {
                 m_pUnitAry = NEW type*;
             } else {
                 type ** p = NEW type*[m_sBlockCount + 1];
-                memcpy_s(p, (m_sBlockCount + 1) * sizeof(type *),m_pUnitAry, m_sBlockCount * sizeof (type *));
+                tools::SafeMemcpy(p, (m_sBlockCount + 1) * sizeof(type *),m_pUnitAry, m_sBlockCount * sizeof (type *));
                 delete[] m_pUnitAry;
                 m_pUnitAry = p;
             }

@@ -38,16 +38,16 @@ void epoll_waiter::Run() { //public cthread
                     m_pEpoller->AddIO(p);
                     break;
                 }
-                case tcore::SO_TCPIO:
+                case tcore::SO_TCPRECV:
                 {
                     m_pEpoller->AddEvent(p);
                     break;
                 }
-                case tcore::SO_UDPIO:
-                {
-                    m_pEpoller->AddEvent(p);
-                    break;
-                }
+//                case tcore::SO_UDPIO:
+//                {
+//                    m_pEpoller->AddEvent(p);
+//                    break;
+//                }
             }
         }
     }
