@@ -38,7 +38,7 @@ void ClientConnectSick::Error(IKernel * pKernel, const s8 opt, void * pContext, 
 }
 
 s32 ClientConnectSick::Recv(IKernel * pKernel, const void * context, const s32 size) {
-    //ECHO("size %d", size);
+    ECHO("size %d", size);
     //Send(context, size);
     return size;
 }
@@ -53,5 +53,5 @@ void ClientConnectSick::Disconnect(IKernel * pKernel) {
 void ClientConnectSick::Connected(IKernel * pKernel) {
     i ++;
     ECHO("connection connected, connection count : %d", i);
-    pKernel->StartTimer(100, this, 2000, 0);
+    pKernel->StartTimer(100, this, 5000, 0);
 }
