@@ -47,7 +47,7 @@ bool Logicmgr::Initialize() {
     while (itor != iend) {
         char path[512] = {0};
 #ifdef linux
-        SafeSprintf(path, sizeof (path), "%s/%s/lib%s.so",
+        SafeSprintf(path, sizeof (path), "%s/%slib%s.so",
                 tools::GetAppPath(), pConfig->strModulePath.c_str(), (*itor).c_str());
 
         void * handle = dlopen(path, RTLD_LAZY);

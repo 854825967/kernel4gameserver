@@ -1,9 +1,9 @@
 #ifndef __IModule_h__
 #define __IModule_h__
 
-#include "MultiSys.h"
 #include "Tools.h"
 #include "IKernel.h"
+#include "MultiSys.h"
 using namespace tcore;
 
 #define MODULE_NAME_LENGTH 64
@@ -31,7 +31,7 @@ public:
     }
 
     bool SetName(const char * pName) {
-        memcpy_s(m_pName, sizeof(m_pName), pName, MODULE_NAME_LENGTH - 1);
+        tools::SafeMemcpy(m_pName, sizeof(m_pName), pName, MODULE_NAME_LENGTH - 1);
         return true;
     }
 

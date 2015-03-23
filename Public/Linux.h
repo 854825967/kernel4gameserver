@@ -24,12 +24,22 @@ typedef int32_t s32;
 typedef int64_t s64;
 
 #define THREAD_FUN void*
-#define ThreadID pthread_id
+#define ThreadID pthread_t
 
 #define CSLEEP(n) usleep(n)
 #define SafeSprintf snprintf
 
 #define ECHO(format, a...) { \
+    char log[4096] = {0}; \
+    SafeSprintf(log, 4096, "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##a); \
+    printf("%s\n", log);}
+
+#define ECHO_TRACE(format, a...) { \
+    char log[4096] = {0}; \
+    SafeSprintf(log, 4096, "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##a); \
+    printf("%s\n", log);}
+
+#define ECHO_ERROR(format, a...) { \
     char log[4096] = {0}; \
     SafeSprintf(log, 4096, "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##a); \
     printf("%s\n", log);}

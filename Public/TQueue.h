@@ -2,6 +2,7 @@
 #define __TQueue_h__
 #include "MultiSys.h"
 #include "CLock.h"
+#include "Tools.h"
 #include <stdio.h>
 #include <string.h>
 

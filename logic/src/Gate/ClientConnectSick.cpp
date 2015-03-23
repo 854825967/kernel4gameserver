@@ -34,7 +34,7 @@ void ClientConnectSick::OnTerminate(IKernel * pKernel, const s32 sTimerID, bool 
 }
 
 void ClientConnectSick::Error(IKernel * pKernel, const s8 opt, void * pContext, const char * debug) {
-    ECHO_ERROR("opt %d, error %s", opt, debug);
+    ECHO("opt %d, error %s", opt, debug);
 }
 
 s32 ClientConnectSick::Recv(IKernel * pKernel, const void * context, const s32 size) {
@@ -45,7 +45,7 @@ s32 ClientConnectSick::Recv(IKernel * pKernel, const void * context, const s32 s
 
 void ClientConnectSick::Disconnect(IKernel * pKernel) {
     i --;
-    ECHO_TRACE("connection Disconnect, connection count : %d", i);
+    ECHO("connection Disconnect, connection count : %d", i);
     pKernel->KillTimer(this);
     delete this;
 }

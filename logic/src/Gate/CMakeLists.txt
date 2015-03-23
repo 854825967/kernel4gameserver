@@ -5,16 +5,16 @@
 INCLUDE_DIRECTORIES(
         "${PROJECT_SOURCE_DIR}/Public"
         "${PROJECT_SOURCE_DIR}/API"
-        "${PROJECT_SOURCE_DIR}/logic/src/interface"
-        "${PROJECT_SOURCE_DIR}/logic/src/define"
+        "${PROJECT_SOURCE_DIR}/logic/src/Interface"
+        "${PROJECT_SOURCE_DIR}/logic/src/Define"
         )
         
 SET(GATE
-    "${PROJECT_SOURCE_DIR}/logic/src/gate/Gate.h"
-    "${PROJECT_SOURCE_DIR}/logic/src/gate/Gate.cpp"
-    "${PROJECT_SOURCE_DIR}/logic/src/gate/ClientConnectSick.h"
-    "${PROJECT_SOURCE_DIR}/logic/src/gate/ClientConnectSick.cpp"
-    "${PROJECT_SOURCE_DIR}/logic/src/gate/main.cpp"
+    "${PROJECT_SOURCE_DIR}/logic/src/Gate/Gate.h"
+    "${PROJECT_SOURCE_DIR}/logic/src/Gate/Gate.cpp"
+    "${PROJECT_SOURCE_DIR}/logic/src/Gate/ClientConnectSick.h"
+    "${PROJECT_SOURCE_DIR}/logic/src/Gate/ClientConnectSick.cpp"
+    "${PROJECT_SOURCE_DIR}/logic/src/Gate/main.cpp"
     )
     
 SOURCE_GROUP(API FILES ${API})

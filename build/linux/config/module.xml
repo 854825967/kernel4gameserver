@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<modules path="./modules/">
-    <module name="gate" />
+<modules path="">
+    <module name="Gate" />
 </modules>

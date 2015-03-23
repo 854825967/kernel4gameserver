@@ -11,6 +11,7 @@
 #include "CThread.h"
 #include "header.h"
 #include "TQueue.h"
+using namespace tlib;
 
 class epoller;
 

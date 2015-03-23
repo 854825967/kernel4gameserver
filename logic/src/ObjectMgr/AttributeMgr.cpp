@@ -9,22 +9,10 @@ using namespace std;
 CAttributeMgr::CAttributeMgr(void)
 {}
 
-void CAttributeMgr::Init(void)
-{
-	m_mapType["s8"] = ATTR_TYPE_S8;
-	m_mapType["s16"] = ATTR_TYPE_S16;
-	m_mapType["s32"] = ATTR_TYPE_S32;
-	m_mapType["s64"] = ATTR_TYPE_S64;
-	m_mapType["string"] = ATTR_TYPE_STRING;
-	m_mapType["blob"] = ATTR_TYPE_BLOB;
-}
-
 bool CAttributeMgr::LoadAllConfig(const string& configfile)
 {
-	Init();
-
-	MAP_CONFIG mapConfig = m_mapConfig;
-	m_mapConfig.clear();
+	MAP_ATTR_CONFIG mapAttrConfig = m_mapAttrConfig;
+	m_mapAttrConfig.clear();
 
 	vector<string> vObjTypes;
 	
@@ -40,24 +28,28 @@ bool CAttributeMgr::LoadAllConfig(const string& configfile)
 		return false;
 	}
 
-	for (TiXmlNode* ndConfigFileName = ndRoot->FirstChild("config"); ndConfigFileName; ndConfigFileName = ndConfigFileName->NextSibling("config"))
-	{
+	s16 nObjTypeIndex = 0;
+
+	for (TiXmlNode* ndConfigFileName = ndRoot->FirstChild("config"); ndConfigFileName; ndConfigFileName = ndConfigFileName->NextSibling("config")) {
 		TiXmlElement* eleConfigFileName = ndConfigFileName->ToElement();
 		string strObjType;
-		if (eleConfigFileName->Attribute("typename"))
-		{
+		s16 nObjType = 0;
+		if (eleConfigFileName->Attribute("typename")) {
 			strObjType = eleConfigFileName->Attribute("typename");
 		}
-		if (strObjType.empty()) {
+		if (eleConfigFileName->Attribute("typeid")) {
+			nObjType = atoi(eleConfigFileName->Attribute("typeid"));
+		}
+		if (strObjType.empty() || ++nObjTypeIndex != nObjType) {
 			return false;
 		}
 		vObjTypes.push_back(strObjType);
+		m_mapObjType[strObjType] = nObjType;
 	}
 
 	for (vector<string>::iterator itr = vObjTypes.begin(); itr != vObjTypes.end(); ++itr) {
 		if (!LoadConfig(*itr)) {
-			m_mapConfig = mapConfig;
-			cout<<"load object config failed ... object type : "<<itr->c_str()<<endl;
+			m_mapAttrConfig = mapAttrConfig;
 			return false;
 		}
 	}
@@ -70,21 +62,27 @@ bool CAttributeMgr::LoadConfig(const string& objType)
 	string objconfigfile = string(tools::GetAppPath()) + "/logic_config/ObjectMgr/" + objType + ".xml";
 
 	TiXmlDocument doc(objconfigfile.c_str());
-	if (!doc.LoadFile())
-	{
+	if (!doc.LoadFile()) {
 		return false;
 	}
 
 	TiXmlNode* ndRoot = doc.RootElement();
-	if (!ndRoot)
-	{
+	if (!ndRoot) {
 		return false;
 	}
 
-	s32 nStartPos = 0;
+	TiXmlElement* eleRoot = ndRoot->ToElement();
+	string strBaseType;
+	if (eleRoot->Attribute("base"))
+		strBaseType = eleRoot->Attribute("base");
 
-	for (TiXmlNode* ndAttr = ndRoot->FirstChild("attr"); ndAttr; ndAttr = ndAttr->NextSibling("attr"))
-	{
+	ATTR_CONFIG* pBaseConfig = GetAttrConfig(strBaseType);
+	if (!pBaseConfig && !strBaseType.empty())
+		return false;
+	m_mapAttrConfig[objType].strBaseType = strBaseType;
+
+	size_t nStartPos = 0;
+	for (TiXmlNode* ndAttr = ndRoot->FirstChild("attr"); ndAttr; ndAttr = ndAttr->NextSibling("attr")) {
 		TiXmlElement* eleAttr = ndAttr->ToElement();
 		string strAttrName;
 		attr_info info;
@@ -95,20 +93,20 @@ bool CAttributeMgr::LoadConfig(const string& objType)
 
 		switch (info.type)
 		{
-		case ATTR_TYPE_S8:
+		case DATA_TYPE_S8:
 			info.length = sizeof(s8);
 			break;
-		case ATTR_TYPE_S16:
+		case DATA_TYPE_S16:
 			info.length = sizeof(s16);
 			break;
-		case ATTR_TYPE_S32:
+		case DATA_TYPE_S32:
 			info.length = sizeof(s32);
 			break;
-		case ATTR_TYPE_S64:
+		case DATA_TYPE_S64:
 			info.length = sizeof(s64);
 			break;
-		case ATTR_TYPE_STRING:
-		case ATTR_TYPE_BLOB:
+		case DATA_TYPE_STRING:
+		case DATA_TYPE_BLOB:
 			{
 				if (eleAttr->Attribute("length"))
 					info.length = atoi(eleAttr->Attribute("length"));
@@ -118,7 +116,6 @@ bool CAttributeMgr::LoadConfig(const string& objType)
 			break;
 		default:
 			{
-				// 类型不可识别
 				TASSERT(false, "format error");
 				return false;
 			}
@@ -128,38 +125,39 @@ bool CAttributeMgr::LoadConfig(const string& objType)
 		info.seripos = nStartPos;
 		nStartPos += info.length;
 
-		if (nStartPos > MAX_ATTR_BUF_LEN)
-		{
-			return false;
-		}
-
-		m_mapConfig[objType][strAttrName] = info;
+		m_mapAttrConfig[objType].mapAttrInfo[strAttrName] = info;
 	}
-
+	m_mapAttrConfig[objType].nBuffLen = nStartPos;
 	return true;
 }
 
 s8 CAttributeMgr::GetType(const string& strType)
 {
-	MAP_TYPE::iterator itr = m_mapType.find(strType.c_str());
-	if (itr != m_mapType.end())
-	{
-		return itr->second;
-	}
-	return ATTR_TYPE_INVALID;
+	return CData::GetDataType(strType.c_str());
 }
 
 attr_info CAttributeMgr::GetAttrInfo(const string& objName, const string& attrName)
 {
-	return m_mapConfig[objName][attrName];
+	return m_mapAttrConfig[objName].mapAttrInfo[attrName];
 }
 
-MAP_ATTR* CAttributeMgr::GetAttrConfig(const string& objtype)
+ATTR_CONFIG* CAttributeMgr::GetAttrConfig(const string& objtype)
 {
-	MAP_CONFIG::iterator itr = m_mapConfig.find(objtype.c_str());
-	if (itr != m_mapConfig.end())
+	MAP_ATTR_CONFIG::iterator itr = m_mapAttrConfig.find(objtype.c_str());
+	if (itr != m_mapAttrConfig.end())
 	{
 		return &(itr->second);
 	}
 	return NULL;
+}
+
+s16 CAttributeMgr::GetObjType(const string& strObjType)
+{
+	MAP_OBJ_TYPE::iterator itr = m_mapObjType.find(strObjType);
+
+	if (itr != m_mapObjType.end())
+	{
+		return itr->second;
+	}
+	return 0;
 }

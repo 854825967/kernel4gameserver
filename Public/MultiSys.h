@@ -1,8 +1,8 @@
 #ifndef __MultiSys_h__
 #define __MultiSys_h__
 
-#include "Linux.h"
 #include "Winsys.h"
+#include "Linux.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,7 +12,7 @@ extern "C" {
 };
 #endif
 
-#ifdef _DEBUG
+#if defined _DEBUG
 /***debug modle***/
 #define NEW new
 
@@ -33,7 +33,7 @@ extern "C" {
 #else
 /***no debug***/
 #define NEW new
-#define TASSERT(p, debug)
+#define TASSERT(p, format, a...)
 #endif //defined _DEBUG
 
 #endif //define __MultiSys_h__

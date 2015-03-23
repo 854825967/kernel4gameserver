@@ -56,7 +56,7 @@ namespace tcore {
 
             if (bRecv) {
                 epoller_data * p = g_EpollerDataPool.Create();
-                p->opt = SO_TCPIO;
+                p->opt = SO_TCPRECV;
                 p->user_ptr = this;
                 p->code = 0;
                 p->len = recvLen;
@@ -65,7 +65,7 @@ namespace tcore {
 
             if (bClose) {
                 epoller_data * p = g_EpollerDataPool.Create();
-                p->opt = SO_TCPIO;
+                p->opt = SO_TCPRECV;
                 p->user_ptr = this;
                 p->code = 0;
                 p->len = 0;
@@ -75,7 +75,7 @@ namespace tcore {
 
             if (bError) {
                 epoller_data * p = g_EpollerDataPool.Create();
-                p->opt = SO_TCPIO;
+                p->opt = SO_TCPRECV;
                 p->user_ptr = this;
                 p->code = -1;
                 p->len = 0;
@@ -102,7 +102,7 @@ namespace tcore {
                     if (ECONNRESET == errno) {
                         TASSERT(false, "send error");
                         epoller_data * p = g_EpollerDataPool.Create();
-                        p->opt = SO_TCPIO;
+                        p->opt = SO_TCPRECV;
                         p->user_ptr = this;
                         p->code = -1;
                         p->len = 0;
@@ -118,7 +118,7 @@ namespace tcore {
             if (m_sendStream.size() == 0 && m_nStatus == SS_WAITCLOSE) {
                 ECHO("tcpsocket closed");
                 epoller_data * p = g_EpollerDataPool.Create();
-                p->opt = SO_TCPIO;
+                p->opt = SO_TCPRECV;
                 p->user_ptr = this;
                 p->code = 0;
                 p->len = 0;
@@ -134,7 +134,7 @@ namespace tcore {
             // error
             ECHO("io error %s", strerror(errno));
             epoller_data * p = g_EpollerDataPool.Create();
-            p->opt = SO_TCPIO;
+            p->opt = SO_TCPRECV;
             p->user_ptr = this;
             p->code = -1;
             p->len = 0;
@@ -153,7 +153,7 @@ namespace tcore {
                 || 0 > getsockopt(socket_handler, SOL_SOCKET, SO_ERROR, &status, &slen)
                 || 0 != status) {
             ECHO("getsockopt error %s", strerror(errno));
-            Error(Kernel::getInstance(), SO_CONNECT, -1);
+            Error(Kernel::getInstance(), SO_CONNECT, NULL, "connected failed");
 
             bool res = pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
             TASSERT(res, strerror(errno));
@@ -161,14 +161,12 @@ namespace tcore {
         } else {
 //            ECHO("non-blocking connect success");
             m_nStatus = SS_ESTABLISHED;
-            Error(Kernel::getInstance(), SO_CONNECT, 0);
-
             bool res = pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
             TASSERT(res, strerror(errno));
 
             epoller_data * data = g_EpollerDataPool.Create();
             data->user_ptr = this;
-            data->opt = SO_TCPIO;
+            data->opt = SO_TCPRECV;
             data->index = s_index++;
 
             epoll_event ev;
@@ -201,7 +199,7 @@ namespace tcore {
 
                     epoller_data * data = g_EpollerDataPool.Create();
                     data->user_ptr = pSocket;
-                    data->opt = SO_TCPIO;
+                    data->opt = SO_TCPRECV;
                     data->index = s_index++;
 
                     epoll_event ev;
@@ -222,7 +220,7 @@ namespace tcore {
 //            ECHO("accept over");
         } else {
             ECHO("bad accept %s", strerror(errno));
-            Error(Kernel::getInstance(), SO_ACCEPT, errno);
+            Error(Kernel::getInstance(), SO_ACCEPT, NULL, "DoAccept error");
             bool res = pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
             TASSERT(res, strerror(errno));
             shut_socket(socket_handler);

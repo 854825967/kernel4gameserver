@@ -7,16 +7,16 @@ void epoll_worker::Run() {
         epoller_data * p;
         if (m_queue.Read(p)) {
             switch (p->opt) {
-                case SO_TCPIO:
+                case SO_TCPRECV:
                 {
                     ITcpSocket * ts = (ITcpSocket *)p->user_ptr;
                     ts->DoIO(p->flags, m_pEpoller);
                     break;
                 }
-                case SO_UDPIO:
-                {
-                    break;
-                }
+//                case SO_UDPIO:
+//                {
+//                    break;
+//                }
                 default:
                     TASSERT(false, "bad opt");
                     break;
