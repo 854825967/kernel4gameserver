@@ -9,7 +9,7 @@ namespace tools {
 #ifdef __cplusplus
     extern "C" {
 #endif
-        inline void SafeMemcpy(void *__restrict __dest, size_t __max, __const void *__restrict __src, size_t __n) {
+        inline void SafeMemcpy(void *__restrict __dest, size_t __max, const void *__restrict __src, size_t __n) {
             TASSERT(__n <= __max, "over flow");
             memcpy(__dest, __src, (__max>=__n)?(__n):(__max));
         }

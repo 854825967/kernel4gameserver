@@ -2,6 +2,7 @@
 #define __CData_h__
 
 #include "MultiSys.h"
+#include "Tools.h"
 #include <map>
 
 using namespace std;
@@ -21,6 +22,15 @@ enum DATA_TYPE {
 
 class CData {
 public:
+	CData()
+		: type(DATA_TYPE_INVALID)
+	{}
+	~CData()
+	{
+		if (type == DATA_TYPE_STRING && strValue) {
+			delete strValue;
+		}
+	}
 	union {
 		s8 s8Value;
 		s16 s16Value;
@@ -79,22 +89,22 @@ public:
 		switch (type)
 		{
 		case DATA_TYPE_S8:
-			memcpy_s(pMem, nLen, &s8Value, sizeof(s8));
+			tools::SafeMemcpy(pMem, nLen, &s8Value, sizeof(s8));
 			break;
 		case DATA_TYPE_S16:
-			memcpy_s(pMem, nLen, &s16Value, sizeof(s16));
+			tools::SafeMemcpy(pMem, nLen, &s16Value, sizeof(s16));
 			break;
 		case DATA_TYPE_S32:
-			memcpy_s(pMem, nLen, &s32Value, sizeof(s32));
+			tools::SafeMemcpy(pMem, nLen, &s32Value, sizeof(s32));
 			break;
 		case DATA_TYPE_S64:
-			memcpy_s(pMem, nLen, &s64Value, sizeof(s64));
+			tools::SafeMemcpy(pMem, nLen, &s64Value, sizeof(s64));
 			break;
 		case DATA_TYPE_DOUBLE:
-			memcpy_s(pMem, nLen, &dValue, sizeof(double));
+			tools::SafeMemcpy(pMem, nLen, &dValue, sizeof(double));
 			break;
 		case DATA_TYPE_STRING:
-			memcpy_s(pMem, nLen, strValue->c_str(), strValue->length());
+			tools::SafeMemcpy(pMem, nLen, strValue->c_str(), strValue->length());
 			break;
 		default:
 			break;
@@ -120,8 +130,8 @@ public:
 		return 0;
 	}
 
-	void SetString(string& strValue) {
-		this->strValue = &strValue;
+	void SetString(const char* szStrValue) {
+		this->strValue = NEW string(szStrValue, strlen(szStrValue));
 		this->type = DATA_TYPE_STRING;
 	}
 	void GetString(string& strValue) {
