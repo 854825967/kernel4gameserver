@@ -22,7 +22,22 @@ namespace tlib {
     template <typename type, bool lock = false, s32 size = 64 >
     class TPool {
     public:
-        typedef list<type *> UNIT_POOL;
+        enum {
+            IN_USE,
+            IS_FREE
+        };
+
+        struct type_info {
+            type unit;
+            const s32 size;
+            s8 status;
+
+            type_info() : size(sizeof(type_info)) {
+                status = IS_FREE;
+            }
+
+        };
+        typedef list<type_info *> UNIT_POOL;
 
         TPool() {
             m_pUnitAry = 0;
@@ -64,7 +79,9 @@ namespace tlib {
             typename UNIT_POOL::iterator itor = m_list.begin();
 
             if (itor != m_list.end()) {
-                p = *itor;
+                p = (type *)*itor;
+                TASSERT((*itor)->status == IS_FREE && (*itor)->size == sizeof(type_info), "wtf");
+                (*itor)->status = IN_USE;
                 m_list.erase(itor);
             }
 #ifdef _DEBUG
@@ -85,7 +102,7 @@ namespace tlib {
 #ifdef _DEBUG
             s64 lTick = tools::GetTimeMillisecond();
 #endif //_DEBUG
-            if (!CheckAddr(pUnit)) {
+            if (!CheckAddr(pUnit) || ((type_info *)pUnit)->status != IN_USE) {
                 TASSERT(false, "point adress error");
                 return false;
             }
@@ -96,7 +113,7 @@ namespace tlib {
 #endif //_DEBUG
             typename UNIT_POOL::iterator ibegin = m_list.begin();
             typename UNIT_POOL::iterator iend = m_list.end();
-            typename UNIT_POOL::iterator itor = ::find(ibegin, iend, pUnit);
+            typename UNIT_POOL::iterator itor = ::find(ibegin, iend, (type_info *)pUnit);
             if (itor != iend) {
 #ifdef _DEBUG
                 test--;
@@ -105,7 +122,8 @@ namespace tlib {
                 POOL_OPT_FREELOCK(lock, m_pLock);
                 return false;
             }
-            m_list.push_back(pUnit);
+            ((type_info *)pUnit)->status = IS_FREE;
+            m_list.push_back((type_info *)pUnit);
 #ifdef _DEBUG
             test--;
             TASSERT(test == 0, "tpool has some bugs");
@@ -125,16 +143,16 @@ namespace tlib {
             POOL_OPT_LOCK(lock, m_pLock);
             if (m_pUnitAry == NULL) {
                 TASSERT(m_sBlockCount == 0, "pool bug");
-                m_pUnitAry = NEW type*;
+                m_pUnitAry = NEW type_info*;
             } else {
-                type ** p = NEW type*[m_sBlockCount + 1];
-                memcpy_s(p, (m_sBlockCount + 1) * sizeof(type *),m_pUnitAry, m_sBlockCount * sizeof (type *));
+                type_info ** p = NEW type_info*[m_sBlockCount + 1];
+                memcpy_s(p, (m_sBlockCount + 1) * sizeof(type_info *),m_pUnitAry, m_sBlockCount * sizeof (type_info *));
                 delete[] m_pUnitAry;
                 m_pUnitAry = p;
             }
 
 
-            m_pUnitAry[m_sBlockCount] = NEW type[size];
+            m_pUnitAry[m_sBlockCount] = NEW type_info[size];
             for (s32 i = 0; i < size; i++) {
                 m_list.push_back(m_pUnitAry[m_sBlockCount] + i);
             }
@@ -143,22 +161,13 @@ namespace tlib {
         }
 
         bool CheckAddr(type * pUnit) {
-            for (s32 i = 0; i < m_sBlockCount; i++) {
-                if (pUnit >= &(m_pUnitAry[i][0])
-                        && pUnit <= &(m_pUnitAry[i][size - 1])
-                        && 0 == ((char *)pUnit - (char *)&(m_pUnitAry[i][0])) % sizeof (type)) {
-
-                    return true;
-                }
-            }
-            
-            return false;
+            return ((type_info *)pUnit)->size == sizeof(type_info);
         }
 
     private:
         UNIT_POOL m_list;
         s32 m_sBlockCount;
-        type ** m_pUnitAry;
+        type_info ** m_pUnitAry;
         CLockUnit * m_pLock;
     };
 }
