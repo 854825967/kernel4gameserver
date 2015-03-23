@@ -38,6 +38,8 @@ SET(TINYXML
     )
 
 SET(PUBLIC
+    "${PROJECT_SOURCE_DIR}/Public/CArgs.h"
+    "${PROJECT_SOURCE_DIR}/Public/CData.h"
     "${PROJECT_SOURCE_DIR}/Public/CLock.h"
     "${PROJECT_SOURCE_DIR}/Public/CLockUnit.h"
     "${PROJECT_SOURCE_DIR}/Public/CRand.h"
