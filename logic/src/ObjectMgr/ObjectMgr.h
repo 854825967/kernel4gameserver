@@ -48,10 +48,20 @@ public:
 	virtual bool InsertTableRow(const objecthandle& hd, const char* szTableName, CArgs& args);
 	virtual bool DeleteTableRow(const objecthandle& hd, const char* szTableName, size_t nRow);
 
-	template<typename IntType>
-	bool SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, IntType nValue);
-	template<typename IntType>
-	bool GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, IntType& nValue);
+	virtual bool SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s8 nValue);
+	virtual bool GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s8& nValue);
+
+	virtual bool SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s16 nValue);
+	virtual bool GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s16& nValue);
+
+	virtual bool SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s32 nValue);
+	virtual bool GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s32& nValue);
+
+	virtual bool SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s64 nValue);
+	virtual bool GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s64& nValue);
+
+	virtual bool SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, double dValue);
+	virtual bool GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, double& dValue);
 
 	virtual bool SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, const char* szValue, size_t nLen);
 	virtual bool GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, string& strValue);

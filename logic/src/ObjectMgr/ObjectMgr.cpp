@@ -319,8 +319,7 @@ bool ObjectMgr::DeleteTableRow(const objecthandle& hd, const char* szTableName, 
 	return obj->DeleteRow(szTableName, nRow);
 }
 
-template<typename IntType>
-bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, IntType nValue) {
+bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s8 nValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -328,13 +327,76 @@ bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, s
 	return obj->SetTableValue(szTableName, nRow, nCol, nValue);
 }
 
-template<typename IntType>
-bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, IntType& nValue) {
+bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s8& nValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
 	}
 	return obj->GetTableValue(szTableName, nRow, nCol, nValue);
+}
+
+bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s16 nValue) {
+	Object* obj = FindObject(hd);
+	if (!obj) {
+		return false;
+	}
+	return obj->SetTableValue(szTableName, nRow, nCol, nValue);
+}
+
+bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s16& nValue) {
+	Object* obj = FindObject(hd);
+	if (!obj) {
+		return false;
+	}
+	return obj->GetTableValue(szTableName, nRow, nCol, nValue);
+}
+
+bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s32 nValue) {
+	Object* obj = FindObject(hd);
+	if (!obj) {
+		return false;
+	}
+	return obj->SetTableValue(szTableName, nRow, nCol, nValue);
+}
+
+bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s32& nValue) {
+	Object* obj = FindObject(hd);
+	if (!obj) {
+		return false;
+	}
+	return obj->GetTableValue(szTableName, nRow, nCol, nValue);
+}
+
+bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s64 nValue) {
+	Object* obj = FindObject(hd);
+	if (!obj) {
+		return false;
+	}
+	return obj->SetTableValue(szTableName, nRow, nCol, nValue);
+}
+
+bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s64& nValue) {
+	Object* obj = FindObject(hd);
+	if (!obj) {
+		return false;
+	}
+	return obj->GetTableValue(szTableName, nRow, nCol, nValue);
+}
+
+bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, double dValue) {
+	Object* obj = FindObject(hd);
+	if (!obj) {
+		return false;
+	}
+	return obj->SetTableValue(szTableName, nRow, nCol, dValue);
+}
+
+bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, double& dValue) {
+	Object* obj = FindObject(hd);
+	if (!obj) {
+		return false;
+	}
+	return obj->GetTableValue(szTableName, nRow, nCol, dValue);
 }
 
 bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, const char* szValue, size_t nLen) {

@@ -3,6 +3,7 @@
 
 #include "Attrib.h"
 #include "IObjectMgr.h"
+#include "Tools.h"
 
 #define MAX_TABLE_DATA_LENGTH	64
 
@@ -120,7 +121,7 @@ bool Object::Table::SetValue(size_t nRow, size_t nCol, IntType nValue) {
 		return false;
 	}
 	TableRow& row = m_rows[nRow];
-	memcpy_s(row.pBlob + nStartPos, row.nBlobLen - nStartPos, &nValue, sizeof(IntType));
+	tools::SafeMemcpy(row.pBlob + nStartPos, row.nBlobLen - nStartPos, &nValue, sizeof(IntType));
 	return true;
 }
 
@@ -135,7 +136,7 @@ bool Object::Table::GetValue(size_t nRow, size_t nCol, IntType& nValue) {
 		return false;
 	}
 	TableRow& row = m_rows[nRow];
-	memcpy_s(&nValue, nColLen, row.pBlob + nStartPos, nColLen);
+	tools::SafeMemcpy(&nValue, nColLen, row.pBlob + nStartPos, nColLen);
 	return true;
 }
 
