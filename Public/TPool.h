@@ -143,13 +143,8 @@ namespace tlib {
                 TASSERT(m_sBlockCount == 0, "pool bug");
                 m_pUnitAry = NEW type_info*;
             } else {
-<<<<<<< HEAD
                 type_info ** p = NEW type_info*[m_sBlockCount + 1];
-                memcpy_s(p, (m_sBlockCount + 1) * sizeof(type_info *),m_pUnitAry, m_sBlockCount * sizeof (type_info *));
-=======
-                type ** p = NEW type*[m_sBlockCount + 1];
-                tools::SafeMemcpy(p, (m_sBlockCount + 1) * sizeof(type *),m_pUnitAry, m_sBlockCount * sizeof (type *));
->>>>>>> 7c4a15459032285d63af59bc476b610810eb5149
+                tools::SafeMemcpy(p, (m_sBlockCount + 1) * sizeof(type_info *),m_pUnitAry, m_sBlockCount * sizeof (type_info *));
                 delete[] m_pUnitAry;
                 m_pUnitAry = p;
             }
