@@ -20,6 +20,12 @@ IF(WIN32)
     MESSAGE(STATUS "WINDOWS")
 ENDIF(WIN32)
 
+IF(CMAKE_CL_64)
+    MESSAGE(STATUS "x64")
+ELSE()
+    MESSAGE(STATUS "x86")
+ENDIF(CMAKE_CL_64)
+
 INCLUDE_DIRECTORIES(
     "${PROJECT_SOURCE_DIR}/Public"
     "${PROJECT_SOURCE_DIR}/API"
@@ -52,6 +58,8 @@ SET(PUBLIC
     "${PROJECT_SOURCE_DIR}/Public/MultiSys.cpp"
     "${PROJECT_SOURCE_DIR}/Public/Tools.h"
     "${PROJECT_SOURCE_DIR}/Public/TPool.h"
+    "${PROJECT_SOURCE_DIR}/Public/TBundler.h"
+    "${PROJECT_SOURCE_DIR}/Public/TCallBack.h"
     "${PROJECT_SOURCE_DIR}/Public/TQueue.h"
     "${PROJECT_SOURCE_DIR}/Public/TStream.h"
     )

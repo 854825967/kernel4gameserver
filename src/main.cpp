@@ -1,15 +1,12 @@
 #include "Kernel.h"
+#include "TBundler.h"
 using namespace tlib;
-
-#include <list>
-using namespace std;
 
 int main() {    
 #ifdef WIN32
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2,2), &wsaData);// ³õÊ¼»¯Windows Socket 2.2
 #endif //WIN32
-
     Kernel * pKernel = (Kernel *) Kernel::getInstance();
     TASSERT(pKernel, "get kernel point error");
     bool res = pKernel->Initialize();

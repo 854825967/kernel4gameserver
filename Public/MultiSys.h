@@ -33,7 +33,7 @@ extern "C" {
 #else
 /***no debug***/
 #define NEW new
-#define TASSERT(p, format, a...)
+#define TASSERT(p, format, ...)
 #endif //defined _DEBUG
 
 #endif //define __MultiSys_h__

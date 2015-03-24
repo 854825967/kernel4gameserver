@@ -7,22 +7,7 @@
 
 #define MAX_TABLE_DATA_LENGTH	64
 
-union objecthandle {
-	objecthandle(s16 typeB, s32 objID)
-	{
-		sType.typeA = 0;
-		sType.typeB = typeB;
-		sType.ID = objID;
-	}
-	struct {
-		s16 typeA;
-		s16 typeB;
-		s32 ID;
-	}sType;
-	s64 objectID;
-};
-
-bool operator<(const objecthandle& lhs, const objecthandle& rhs);
+bool operator<(const OHandler& lhs, const OHandler& rhs);
 
 class ObjectIDFactory {
 public:
@@ -38,7 +23,7 @@ public:
 	ObjectIDFactory()
 		: m_nId (0)
 	{}
-	objecthandle FetchID (s16 nType);
+	OHandler FetchID (s16 nType);
 private:
 	s32 m_nId;
 };

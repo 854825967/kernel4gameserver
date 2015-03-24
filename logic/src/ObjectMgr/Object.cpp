@@ -3,12 +3,12 @@
 #include "CArgs.h"
 
 
-objecthandle ObjectIDFactory::FetchID(s16 nType)
+OHandler ObjectIDFactory::FetchID(s16 nType)
 {
-	return objecthandle(nType, ++m_nId);
+	return OHandler(nType, ++m_nId);
 }
 
-bool operator<(const objecthandle& lhs, const objecthandle& rhs)
+bool operator<(const OHandler& lhs, const OHandler& rhs)
 {
 	return lhs.objectID < rhs.objectID;
 }

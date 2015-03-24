@@ -10,6 +10,8 @@
 
 #include "IGate.h"
 #include "IKernel.h"
+#include "TBundler.h"
+#include "CData.h"
 
 class Gate : public IGate, ITcpServer, ITimer {
 public:
@@ -25,7 +27,6 @@ public:
     //called after last OnTimer or remove timer, do not affect OnTimer count
     //nonviolent will be false if timer is removed by developer,  otherwise true 
     virtual void OnTerminate(IKernel * pKernel, const s32 sTimerID, bool nonviolent, s64 lTimetick);
-
 };
 
 #endif	/* GATE_H */

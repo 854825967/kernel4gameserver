@@ -47,21 +47,21 @@ bool ObjectMgr::Destroy(IKernel * pKernel) {
 	return true;
 }
 
-objecthandle ObjectMgr::CreateObject(const string& strObjectType) {
+OHandler ObjectMgr::CreateObject(const string& strObjectType) {
 	Object* pObj = NEW Object;
 	if (!pObj || !pObj->SetType(strObjectType.c_str())) {
 		if (pObj)
 			delete pObj;
 
-		return objecthandle(0, 0);
+		return OHandler(0, 0);
 	}
 
 	s16 nType = GetObjType(strObjectType);
 
-	objecthandle objId = ObjectIDFactory::getInstance()->FetchID(nType);
+	OHandler objId = ObjectIDFactory::getInstance()->FetchID(nType);
 	if (!pObj->SetAttr("object_id", objId.objectID)) {
 		delete pObj;
-		return objecthandle(0, 0);
+		return OHandler(0, 0);
 	}
 
 	m_mapObject[objId.objectID] = pObj;
@@ -69,7 +69,7 @@ objecthandle ObjectMgr::CreateObject(const string& strObjectType) {
 	return objId;
 }
 
-bool ObjectMgr::CreateObject(const string& strObjectType, const objecthandle& objId) {
+bool ObjectMgr::CreateObject(const string& strObjectType, const OHandler& objId) {
 	Object* pObj = NEW Object;
 	if (!pObj || !pObj->SetType(strObjectType.c_str()) || !pObj->SetAttr("object_id", objId.objectID)) {
 		if (pObj)
@@ -81,7 +81,7 @@ bool ObjectMgr::CreateObject(const string& strObjectType, const objecthandle& ob
 	return true;
 }
 
-bool ObjectMgr::DestroyObject(const objecthandle& hd)
+bool ObjectMgr::DestroyObject(const OHandler& hd)
 {
 	map<s64, Object*>::iterator itr = m_mapObject.find(hd.objectID);
 	if (itr == m_mapObject.end())
@@ -93,7 +93,7 @@ bool ObjectMgr::DestroyObject(const objecthandle& hd)
 	return true;
 }
 
-bool ObjectMgr::Exists(const objecthandle& hd) {
+bool ObjectMgr::Exists(const OHandler& hd) {
 	return FindObject(hd) != NULL;
 }
 
@@ -101,7 +101,7 @@ s16 ObjectMgr::GetObjType(const string& strObjType) {
 	return CAttributeMgr::Instance()->GetObjType(strObjType);
 }
 
-s8 ObjectMgr::GetAttrType(const objecthandle& objhd, const char* szAttrName) {
+s8 ObjectMgr::GetAttrType(const OHandler& objhd, const char* szAttrName) {
 	Object* pObj = FindObject(objhd);
 	if (pObj)
 		return pObj->GetAttrType(szAttrName);
@@ -109,26 +109,26 @@ s8 ObjectMgr::GetAttrType(const objecthandle& objhd, const char* szAttrName) {
 	return DATA_TYPE_INVALID;
 }
 
-size_t ObjectMgr::GetAttrLength(const objecthandle& objhd, const char* szAttrName) {
+size_t ObjectMgr::GetAttrLength(const OHandler& objhd, const char* szAttrName) {
 	Object* pObj = FindObject(objhd);
 	if (pObj)
 		return pObj->GetAttrLength(szAttrName);
 	return 0;
 }
 
-void ObjectMgr::GetAllAttrs(const objecthandle& objhd, vector<string>& vAttrs) {
+void ObjectMgr::GetAllAttrs(const OHandler& objhd, vector<string>& vAttrs) {
 	Object* pObj = FindObject(objhd);
 	if (pObj)
 		pObj->GetAllAttrs(vAttrs);
 }
 
-void ObjectMgr::GetSelfAttrs(const objecthandle& objhd, vector<string>& vAttrs) {
+void ObjectMgr::GetSelfAttrs(const OHandler& objhd, vector<string>& vAttrs) {
 	Object* pObj = FindObject(objhd);
 	if (pObj)
 		pObj->GetSelfAttrs(vAttrs);
 }
 
-Object* ObjectMgr::FindObject(const objecthandle& objh) {
+Object* ObjectMgr::FindObject(const OHandler& objh) {
 	map<s64, Object*>::iterator itr = m_mapObject.find(objh.objectID);
 
 	if (itr != m_mapObject.end())
@@ -137,7 +137,7 @@ Object* ObjectMgr::FindObject(const objecthandle& objh) {
 	return NULL;
 }
 
-bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, s8 nValue) {
+bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, s8 nValue) {
 	Object* obj = FindObject(hd);
 
 	if (obj && obj->SetAttr(szAttrName, nValue)) {
@@ -148,7 +148,7 @@ bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, s8 nValu
 	return false;
 }
 
-bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, s16 nValue) {
+bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, s16 nValue) {
 	Object* obj = FindObject(hd);
 
 	if (obj && obj->SetAttr(szAttrName, nValue)) {
@@ -159,7 +159,7 @@ bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, s16 nVal
 	return false;
 }
 
-bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, s32 nValue) {
+bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, s32 nValue) {
 	Object* obj = FindObject(hd);
 
 	if (obj && obj->SetAttr(szAttrName, nValue)) {
@@ -170,7 +170,7 @@ bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, s32 nVal
 	return false;
 }
 
-bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, s64 nValue) {
+bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, s64 nValue) {
 	Object* obj = FindObject(hd);
 
 	if (obj && obj->SetAttr(szAttrName, nValue)) {
@@ -181,7 +181,7 @@ bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, s64 nVal
 	return false;
 }
 
-bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, double dValue) {
+bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, double dValue) {
 	Object* obj = FindObject(hd);
 
 	if (obj && obj->SetAttr(szAttrName, dValue)) {
@@ -192,7 +192,7 @@ bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, double d
 	return false;
 }
 
-bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, const char* szAttrValue, size_t nLen) {
+bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, const char* szAttrValue, size_t nLen) {
 	Object* obj = FindObject(hd);
 
 	if (obj && obj->SetAttr(szAttrName, szAttrValue, nLen)) {
@@ -203,7 +203,7 @@ bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, const ch
 	return false;
 }
 
-bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, const void* pBlob, size_t nBlobLen) {
+bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, const void* pBlob, size_t nBlobLen) {
 	Object* obj = FindObject(hd);
 
 	if (obj && obj->SetAttr(szAttrName, pBlob, nBlobLen)) {
@@ -214,7 +214,7 @@ bool ObjectMgr::SetAttr(const objecthandle& hd, const char* szAttrName, const vo
 	return false;
 }
 
-bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, s8& nValue)
+bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s8& nValue)
 {
 	Object* obj = FindObject(hd);
 
@@ -225,7 +225,7 @@ bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, s8& nVal
 	return false;
 }
 
-bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, s16& nValue)
+bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s16& nValue)
 {
 	Object* obj = FindObject(hd);
 
@@ -236,7 +236,7 @@ bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, s16& nVa
 	return false;
 }
 
-bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, s32& nValue)
+bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s32& nValue)
 {
 	Object* obj = FindObject(hd);
 
@@ -247,7 +247,7 @@ bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, s32& nVa
 	return false;
 }
 
-bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, s64& nValue)
+bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s64& nValue)
 {
 	Object* obj = FindObject(hd);
 
@@ -258,7 +258,7 @@ bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, s64& nVa
 	return false;
 }
 
-bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, double& dValue)
+bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, double& dValue)
 {
 	Object* obj = FindObject(hd);
 
@@ -269,7 +269,7 @@ bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, double& 
 	return false;
 }
 
-bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, string& strValue) {
+bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, string& strValue) {
 	Object* obj = FindObject(hd);
 	if (obj && obj->GetAttr(szAttrName, strValue)) {
 		return true;
@@ -278,7 +278,7 @@ bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, string& 
 	return false;
 }
 
-bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, void* pBlob, size_t nBlobLen) {
+bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, void* pBlob, size_t nBlobLen) {
 	Object* obj = FindObject(hd);
 	if (obj && obj->GetAttr(szAttrName, pBlob, nBlobLen)) {
 		return true;
@@ -287,7 +287,7 @@ bool ObjectMgr::GetAttr(const objecthandle& hd, const char* szAttrName, void* pB
 	return false;
 }
 
-bool ObjectMgr::CreateTable(const objecthandle& hd, const char* szTableName, const TABLE_COLUMN_TYPES& coltypes) {
+bool ObjectMgr::CreateTable(const OHandler& hd, const char* szTableName, const TABLE_COLUMN_TYPES& coltypes) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -295,7 +295,7 @@ bool ObjectMgr::CreateTable(const objecthandle& hd, const char* szTableName, con
 	return obj->CreateTable(szTableName, coltypes);
 }
 
-bool ObjectMgr::DestroyTable(const objecthandle& hd, const char* szTableName) {
+bool ObjectMgr::DestroyTable(const OHandler& hd, const char* szTableName) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -303,7 +303,7 @@ bool ObjectMgr::DestroyTable(const objecthandle& hd, const char* szTableName) {
 	return obj->DestroyTable(szTableName);
 }
 
-bool ObjectMgr::InsertTableRow(const objecthandle& hd, const char* szTableName, CArgs& args) {
+bool ObjectMgr::InsertTableRow(const OHandler& hd, const char* szTableName, CArgs& args) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -311,7 +311,7 @@ bool ObjectMgr::InsertTableRow(const objecthandle& hd, const char* szTableName, 
 	return obj->InsertRow(szTableName, args);
 }
 
-bool ObjectMgr::DeleteTableRow(const objecthandle& hd, const char* szTableName, size_t nRow) {
+bool ObjectMgr::DeleteTableRow(const OHandler& hd, const char* szTableName, size_t nRow) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -319,7 +319,7 @@ bool ObjectMgr::DeleteTableRow(const objecthandle& hd, const char* szTableName, 
 	return obj->DeleteRow(szTableName, nRow);
 }
 
-bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s8 nValue) {
+bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s8 nValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -327,7 +327,7 @@ bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, s
 	return obj->SetTableValue(szTableName, nRow, nCol, nValue);
 }
 
-bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s8& nValue) {
+bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s8& nValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -335,7 +335,7 @@ bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, s
 	return obj->GetTableValue(szTableName, nRow, nCol, nValue);
 }
 
-bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s16 nValue) {
+bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s16 nValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -343,7 +343,7 @@ bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, s
 	return obj->SetTableValue(szTableName, nRow, nCol, nValue);
 }
 
-bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s16& nValue) {
+bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s16& nValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -351,7 +351,7 @@ bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, s
 	return obj->GetTableValue(szTableName, nRow, nCol, nValue);
 }
 
-bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s32 nValue) {
+bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s32 nValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -359,7 +359,7 @@ bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, s
 	return obj->SetTableValue(szTableName, nRow, nCol, nValue);
 }
 
-bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s32& nValue) {
+bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s32& nValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -367,7 +367,7 @@ bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, s
 	return obj->GetTableValue(szTableName, nRow, nCol, nValue);
 }
 
-bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s64 nValue) {
+bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s64 nValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -375,7 +375,7 @@ bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, s
 	return obj->SetTableValue(szTableName, nRow, nCol, nValue);
 }
 
-bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, s64& nValue) {
+bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s64& nValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -383,7 +383,7 @@ bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, s
 	return obj->GetTableValue(szTableName, nRow, nCol, nValue);
 }
 
-bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, double dValue) {
+bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, double dValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -391,7 +391,7 @@ bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, s
 	return obj->SetTableValue(szTableName, nRow, nCol, dValue);
 }
 
-bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, double& dValue) {
+bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, double& dValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -399,7 +399,7 @@ bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, s
 	return obj->GetTableValue(szTableName, nRow, nCol, dValue);
 }
 
-bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, const char* szValue, size_t nLen) {
+bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, const char* szValue, size_t nLen) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
@@ -407,7 +407,7 @@ bool ObjectMgr::SetTableValue(const objecthandle& hd, const char* szTableName, s
 	return obj->SetTableValue(szTableName, nRow, nCol, szValue, nLen);
 }
 
-bool ObjectMgr::GetTableValue(const objecthandle& hd, const char* szTableName, size_t nRow, size_t nCol, string& strValue) {
+bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, string& strValue) {
 	Object* obj = FindObject(hd);
 	if (!obj) {
 		return false;
