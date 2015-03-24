@@ -138,135 +138,63 @@ Object* ObjectMgr::FindObject(const OHandler& objh) {
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, s8 nValue) {
-	Object* obj = FindObject(hd);
-
-	if (obj && obj->SetAttr(szAttrName, nValue)) {
-		call_back(obj->GetType(), szAttrName);
-		return true;
-	}
-
-	return false;
+	return SetAttr(hd, szAttrName, nValue);
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, s16 nValue) {
-	Object* obj = FindObject(hd);
-
-	if (obj && obj->SetAttr(szAttrName, nValue)) {
-		call_back(obj->GetType(), szAttrName);
-		return true;
-	}
-
-	return false;
+	return SetAttr(hd, szAttrName, nValue);
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, s32 nValue) {
-	Object* obj = FindObject(hd);
-
-	if (obj && obj->SetAttr(szAttrName, nValue)) {
-		call_back(obj->GetType(), szAttrName);
-		return true;
-	}
-
-	return false;
+	return SetAttr(hd, szAttrName, nValue);
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, s64 nValue) {
-	Object* obj = FindObject(hd);
-
-	if (obj && obj->SetAttr(szAttrName, nValue)) {
-		call_back(obj->GetType(), szAttrName);
-		return true;
-	}
-
-	return false;
+	return SetAttr(hd, szAttrName, nValue);
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, double dValue) {
-	Object* obj = FindObject(hd);
-
-	if (obj && obj->SetAttr(szAttrName, dValue)) {
-		call_back(obj->GetType(), szAttrName);
-		return true;
-	}
-
-	return false;
+	return SetAttr(hd, szAttrName, dValue);
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, const char* szAttrValue, size_t nLen) {
 	Object* obj = FindObject(hd);
-
 	if (obj && obj->SetAttr(szAttrName, szAttrValue, nLen)) {
-		call_back(obj->GetType(), szAttrName);
+		CData data;
+		data.type = DATA_TYPE_STRING;
+		data.SetString(szAttrValue);
+		m_callbacks.call_bundler(szAttrName, szAttrName, data);
 		return true;
 	}
-
 	return false;
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, const void* pBlob, size_t nBlobLen) {
 	Object* obj = FindObject(hd);
-
 	if (obj && obj->SetAttr(szAttrName, pBlob, nBlobLen)) {
-		call_back(obj->GetType(), szAttrName);
 		return true;
 	}
-
 	return false;
 }
 
-bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s8& nValue)
-{
-	Object* obj = FindObject(hd);
-
-	if (obj && obj->GetAttr(szAttrName, nValue)) {
-		return true;
-	}
-
-	return false;
+bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s8& nValue) {
+	return GetAttr(hd, szAttrName, nValue);
 }
 
-bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s16& nValue)
-{
-	Object* obj = FindObject(hd);
-
-	if (obj && obj->GetAttr(szAttrName, nValue)) {
-		return true;
-	}
-
-	return false;
+bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s16& nValue) {
+	return GetAttr(hd, szAttrName, nValue);
 }
 
-bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s32& nValue)
-{
-	Object* obj = FindObject(hd);
-
-	if (obj && obj->GetAttr(szAttrName, nValue)) {
-		return true;
-	}
-
-	return false;
+bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s32& nValue) {
+	return GetAttr(hd, szAttrName, nValue);
 }
 
-bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s64& nValue)
-{
-	Object* obj = FindObject(hd);
-
-	if (obj && obj->GetAttr(szAttrName, nValue)) {
-		return true;
-	}
-
-	return false;
+bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s64& nValue){
+	return GetAttr(hd, szAttrName, nValue);
 }
 
-bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, double& dValue)
-{
-	Object* obj = FindObject(hd);
-
-	if (obj && obj->GetAttr(szAttrName, dValue)) {
-		return true;
-	}
-
-	return false;
+bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, double& dValue) {
+	return GetAttr(hd, szAttrName, dValue);
 }
 
 bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, string& strValue) {
@@ -274,7 +202,6 @@ bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, string& strV
 	if (obj && obj->GetAttr(szAttrName, strValue)) {
 		return true;
 	}
-
 	return false;
 }
 
@@ -283,7 +210,6 @@ bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, void* pBlob,
 	if (obj && obj->GetAttr(szAttrName, pBlob, nBlobLen)) {
 		return true;
 	}
-
 	return false;
 }
 
@@ -320,83 +246,43 @@ bool ObjectMgr::DeleteTableRow(const OHandler& hd, const char* szTableName, size
 }
 
 bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s8 nValue) {
-	Object* obj = FindObject(hd);
-	if (!obj) {
-		return false;
-	}
-	return obj->SetTableValue(szTableName, nRow, nCol, nValue);
+	return SetTableValue(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s8& nValue) {
-	Object* obj = FindObject(hd);
-	if (!obj) {
-		return false;
-	}
-	return obj->GetTableValue(szTableName, nRow, nCol, nValue);
+	return GetTableValue(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s16 nValue) {
-	Object* obj = FindObject(hd);
-	if (!obj) {
-		return false;
-	}
-	return obj->SetTableValue(szTableName, nRow, nCol, nValue);
+	return SetTableValue(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s16& nValue) {
-	Object* obj = FindObject(hd);
-	if (!obj) {
-		return false;
-	}
-	return obj->GetTableValue(szTableName, nRow, nCol, nValue);
+	return GetTableValue(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s32 nValue) {
-	Object* obj = FindObject(hd);
-	if (!obj) {
-		return false;
-	}
-	return obj->SetTableValue(szTableName, nRow, nCol, nValue);
+	return SetTableValue(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s32& nValue) {
-	Object* obj = FindObject(hd);
-	if (!obj) {
-		return false;
-	}
-	return obj->GetTableValue(szTableName, nRow, nCol, nValue);
+	return GetTableValue(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s64 nValue) {
-	Object* obj = FindObject(hd);
-	if (!obj) {
-		return false;
-	}
-	return obj->SetTableValue(szTableName, nRow, nCol, nValue);
+	return SetTableValue(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s64& nValue) {
-	Object* obj = FindObject(hd);
-	if (!obj) {
-		return false;
-	}
-	return obj->GetTableValue(szTableName, nRow, nCol, nValue);
+	return GetTableValue(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, double dValue) {
-	Object* obj = FindObject(hd);
-	if (!obj) {
-		return false;
-	}
-	return obj->SetTableValue(szTableName, nRow, nCol, dValue);
+	return SetTableValue(hd, szTableName, nRow, nCol, dValue);
 }
 
 bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, double& dValue) {
-	Object* obj = FindObject(hd);
-	if (!obj) {
-		return false;
-	}
-	return obj->GetTableValue(szTableName, nRow, nCol, dValue);
+	return GetTableValue(hd, szTableName, nRow, nCol, dValue);
 }
 
 bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, const char* szValue, size_t nLen) {
@@ -415,17 +301,12 @@ bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_
 	return obj->GetTableValue(szTableName, nRow, nCol, strValue);
 }
 
-void ObjectMgr::call_back(const char* szObjType, const char* szAttrName) {
-	map<string, map<string, SET_ATTR_CALLBACK> >::iterator itrObjType = m_mapSetAttrCallBack.find(szObjType);
-	if (itrObjType != m_mapSetAttrCallBack.end()) {
-		map<string, SET_ATTR_CALLBACK>::iterator itrAttrName = itrObjType->second.find(szAttrName);
-		if (itrAttrName != itrObjType->second.end()) {
-			(*itrAttrName->second)();
-		}
-	}
+bool ObjectMgr::RgsModifyAttributeCall(IModule* module, const string& szAttrName, mem_fun mf) {
+	m_callbacks.bind(szAttrName, module, mf);
+	return true;
 }
 
-void ObjectMgr::RegisterSetAttrCallback(const char* szObjType, const char* szAttrName, SET_ATTR_CALLBACK callback)
-{
-	m_mapSetAttrCallBack[szObjType][szAttrName] = callback;
+bool ObjectMgr::UnRgsModifyAttributeCall(IModule* module, const string& szAttrName, mem_fun mf) {
+	m_callbacks.unbind(szAttrName, module, mf);
+	return true;
 }

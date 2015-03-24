@@ -77,8 +77,7 @@ bool Attrib::IsValidAttrLength(const char* attrname, size_t attrlength, bool bIs
 
 	MAP_ATTR_INFO::iterator itr = pAttrInfoMap->find(attrname);
 	
-	if (itr != pAttrInfoMap->end())
-	{
+	if (itr != pAttrInfoMap->end())	{
 		switch(itr->second.type)
 		{
 		case DATA_TYPE_S8:

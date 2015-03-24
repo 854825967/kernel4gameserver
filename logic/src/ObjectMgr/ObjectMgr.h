@@ -4,7 +4,9 @@
 #include "IObjectMgr.h"
 #include "Object.h"
 #include <map>
+#include "TBundler.h"
 using namespace std;
+
 
 union OHandler;
 
@@ -66,8 +68,8 @@ public:
 	virtual bool SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, const char* szValue, size_t nLen);
 	virtual bool GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, string& strValue);
 
-	typedef void (*SET_ATTR_CALLBACK)(void);
-	void RegisterSetAttrCallback(const char* szObjType, const char* szAttrName, SET_ATTR_CALLBACK callback);
+	virtual bool RgsModifyAttributeCall(IModule* module, const string& szAttrName, mem_fun mf);
+	virtual bool UnRgsModifyAttributeCall(IModule* module, const string& szAttrName, mem_fun mf);
 
 private:
 	s16 GetObjType(const string& strObjType);
@@ -76,9 +78,47 @@ private:
 	void GetAllAttrs(const OHandler& objhd, vector<string>& vAttrs);
 	void GetSelfAttrs(const OHandler& objhd, vector<string>& vAttrs);
 	Object* FindObject(const OHandler& objh);
-	void call_back(const char* szObjType, const char* szAttrName);
-	map<string, map<string, SET_ATTR_CALLBACK> > m_mapSetAttrCallBack;
+
+	template<typename Type>
+	bool SetAttr(const OHandler& hd, const char* szAttrName, Type value) {
+		Object* obj = FindObject(hd);
+		if (obj && obj->SetAttr(szAttrName, value)) {
+			CData data;
+			data.type = CData::GetDataType(value);
+			data.SetValue(value);
+			m_callbacks.call_bundler(szAttrName, szAttrName, data);
+			return true;
+		}
+		return false;
+	}
+	template<typename Type>
+	bool GetAttr(const OHandler& hd, const char* szAttrName, Type& value) {
+		Object* obj = FindObject(hd);
+		if (obj && obj->GetAttr(szAttrName, value)) {
+			return true;
+		}
+		return false;
+	}
+
+	template<typename Type>
+	bool SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, Type value) {
+		Object* obj = FindObject(hd);
+		if (!obj)
+			return false;
+		return obj->SetTableValue(szTableName, nRow, nCol, value);
+	}
+
+	template<typename Type>
+	bool GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, Type& value) {
+		Object* obj = FindObject(hd);
+		if (!obj)
+			return false;
+		return obj->GetTableValue(szTableName, nRow, nCol, value);
+	}
+
+private:
 	map<s64, Object*> m_mapObject;
+	tlib::bundler_pool<IModule, string, string, const CData&> m_callbacks;
 };
 
 

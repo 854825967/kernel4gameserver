@@ -36,13 +36,7 @@ void Gate::OnStart(IKernel * pKernel, const s32 sTimerID, s64 lTimetick) {
 }
 
 void Gate::OnTime(IKernel * pKernel, const s32 sTimerID, s64 lTimetick) {
-//     for (s32 i=0; i<1; i++) {
-//         SendConnectSick * pClient = NEW SendConnectSick;
-//         pClient->InitAddr("127.0.0.1", 12580);
-//         pKernel->StartTcpClient(pClient);
-//     }
-    s32 nRand = rand();
-    m_bundlerPool.call_bundler(nRand%2, nRand);
+
 }
 
 //called after last OnTimer or remove timer, do not affect OnTimer count

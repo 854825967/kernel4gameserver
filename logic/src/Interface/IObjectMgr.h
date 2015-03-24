@@ -10,6 +10,7 @@
 
 #include "IModule.h"
 #include <vector>
+#include "CData.h"
 
 using namespace std;
 
@@ -84,6 +85,10 @@ public:
 
 	virtual bool SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, const char* szValue, size_t nLen) = 0;
 	virtual bool GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, string& strValue) = 0;
+
+	typedef void (IModule::*mem_fun) (string strAttrName, const CData& data);
+	virtual bool RgsModifyAttributeCall(IModule* module, const string& szAttrName, mem_fun mf) = 0;
+	virtual bool UnRgsModifyAttributeCall(IModule* module, const string& szAttrName, mem_fun mf) = 0;
 };
 
 #endif	/* __IObjectMgr_h__ */
