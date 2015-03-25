@@ -1,7 +1,7 @@
-message DemoClientReq {
+message DemoClientReq { // MSGID : CLIENT_MSG_CHOOSE_SERVER_REQ
     required string text=1;
 };
 
-message DemoServerAsk {
+message DemoServerAsk { // MSGID : SERVER_MSG_CHOOSE_SERVER_ASK
     required string text=1;
 }

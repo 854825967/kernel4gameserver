@@ -1,5 +1,7 @@
 #include "Kernel.h"
 using namespace tlib;
+#include <list>
+using namespace std;
 
 int main() {    
 #ifdef WIN32

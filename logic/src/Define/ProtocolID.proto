@@ -1,0 +1,18 @@
+enum ClientMsgID {
+
+    //登陆模块消息 每个模块空100个消息ID空间
+    CLIENT_MSG_CHOOSE_SERVER_REQ = 10000; // 客户端连上中心服务器之后发送此消息获取游戏服务器路径
+    CLIENT_MSG_LOGIN_REQ = 10001;  // 客户端登陆消息
+    CLIENT_MSG_HEARTBEAT = 10002;  // 客户端定时发送心跳消息,服务器超时未收到视为死链接自动断线
+
+    //状态模块
+    CLIENT_MSG_MOVEO = 10100;
+
+    //战斗模块
+    CLIENT_MSG_CAST_ABILITY_REQ = 10200;
+};
+
+enum ServerMsgID {
+    SERVER_MSG_CHOOSE_SERVER_ASK = 50000;
+    SERVER_MSG_LOGIN_RES_ASK = 50001;
+};

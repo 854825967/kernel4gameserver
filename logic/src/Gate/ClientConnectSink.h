@@ -10,12 +10,13 @@
 
 #include "IConnectionSink.h"
 #include "demo.pb.h"
+#include "ProtocolID.pb.h"
 using namespace tcore;
 
 class ClientConnectSink : public IConnectionSink {
 public:
     virtual void OnConnected(tcore::IKernel * pKernel) {
-        RGS_MSG_CALL(1, ClientConnectSink::OnClientTest);
+        RGS_MSG_CALL(CLIENT_MSG_CHOOSE_SERVER_REQ, ClientConnectSink::OnClientTest);
     }
 
     virtual void OnConnectFailed(tcore::IKernel * pKernel) {
@@ -38,7 +39,7 @@ public:
         ask.set_text("come on baby");
         string buff;
         ask.SerializeToString(&buff);
-        SendMSG(1, buff.c_str(), buff.size());
+        SendMSG(SERVER_MSG_CHOOSE_SERVER_ASK, buff.c_str(), buff.size());
     }
 
 private:
