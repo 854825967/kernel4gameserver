@@ -41,7 +41,7 @@ public:
 	};
 	s8 type;
 
-	static s8 GetDataType (const char* szDataTypeName) {
+	static s8 GetDataType(const char* szDataTypeName) {
 		static map<string, s8> mapDataType;
 		if (mapDataType.empty()) {
 			mapDataType["s8"] = DATA_TYPE_S8;
@@ -56,6 +56,26 @@ public:
 			return mapDataType[szDataTypeName];
 		}
 		return DATA_TYPE_INVALID;
+	}
+
+	static s8 GetDataType(s8 value) {
+		return DATA_TYPE_S8;
+	}
+
+	static s8 GetDataType(s16 value) {
+		return DATA_TYPE_S16;
+	}
+
+	static s8 GetDataType(s32 value) {
+		return DATA_TYPE_S32;
+	}
+
+	static s8 GetDataType(s64 value) {
+		return DATA_TYPE_S64;
+	}
+
+	static s8 GetDataType(double value) {
+		return DATA_TYPE_DOUBLE;
 	}
 
 	static size_t GetDataLength(s8 type) {
@@ -187,6 +207,27 @@ public:
 	void GetDouble(double& dValue) {
 		if (type == DATA_TYPE_DOUBLE) {
 			dValue = this->dValue;
+		}
+	}
+
+	template<typename Type>
+	void SetValue(Type value) {
+		switch (type) {
+		case DATA_TYPE_S8:
+			s8Value = value;
+			break;
+		case DATA_TYPE_S16:
+			s16Value = value;
+			break;
+		case DATA_TYPE_S32:
+			s32Value = value;
+			break;
+		case DATA_TYPE_S64:
+			s64Value = value;
+			break;
+		case DATA_TYPE_DOUBLE:
+			dValue = value;
+			break;
 		}
 	}
 };
