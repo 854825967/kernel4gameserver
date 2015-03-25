@@ -12,20 +12,16 @@ class Attrib
 {
 public:
 	Attrib(void);
-	~Attrib(void);
-	
+	~Attrib(void);	
 
-	template<typename IntType>
-	bool SetAttr(const char* szAttrName, IntType nNum)
-	{
-
-		return SetValue(szAttrName, &nNum, sizeof(IntType));
+	template<typename Type>
+	bool SetAttr(const char* szAttrName, Type nNum) {
+		return SetValue(szAttrName, &nNum, sizeof(Type));
 	}
-	template<typename IntType>
-	bool GetAttr(const char* szAttrName, IntType& nNum)
-	{
 
-		return GetValue(szAttrName, &nNum, sizeof(IntType));
+	template<typename Type>
+	bool GetAttr(const char* szAttrName, Type& nNum) {
+		return GetValue(szAttrName, &nNum, sizeof(Type));
 	}
 
 	bool SetAttr(const char* szAttrName, const char* szAttrValue, size_t nLen);

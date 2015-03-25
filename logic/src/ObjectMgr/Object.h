@@ -42,14 +42,14 @@ public:
 	bool InsertRow(const char* szTableName, CArgs& args);
 	bool DeleteRow(const char* szTableName, size_t nRow);
 
-	template<typename IntType>
-	bool SetTableValue(const char* szTableName, size_t nRow, size_t nCol, IntType nValue) {
+	template<typename Type>
+	bool SetTableValue(const char* szTableName, size_t nRow, size_t nCol, Type nValue) {
 		if (m_mapTables.find(szTableName) == m_mapTables.end())
 			return false;
 		return m_mapTables[szTableName].SetValue(nRow, nCol, nValue);
 	}
-	template<typename IntType>
-	bool GetTableValue(const char* szTableName, size_t nRow, size_t nCol, IntType& nValue) {
+	template<typename Type>
+	bool GetTableValue(const char* szTableName, size_t nRow, size_t nCol, Type& nValue) {
 		if (m_mapTables.find(szTableName) == m_mapTables.end())
 			return false;
 		return m_mapTables[szTableName].GetValue(nRow, nCol, nValue);
@@ -77,10 +77,10 @@ protected:
 		bool InsertRow(CArgs& args);
 		bool DeleteRow(size_t nRow);
 		
-		template<typename IntType>
-		bool SetValue(size_t nRow, size_t nCol, IntType nValue);
-		template<typename IntType>
-		bool GetValue(size_t nRow, size_t nCol, IntType& nValue);
+		template<typename Type>
+		bool SetValue(size_t nRow, size_t nCol, Type nValue);
+		template<typename Type>
+		bool GetValue(size_t nRow, size_t nCol, Type& nValue);
 
 		bool SetValue(size_t nRow, size_t nCol, const char* szValue, size_t nLen);
 		bool GetValue(size_t nRow, size_t nCol, string& strValue);
@@ -95,29 +95,29 @@ protected:
 	string m_strType;
 };
 
-template<typename IntType>
-bool Object::Table::SetValue(size_t nRow, size_t nCol, IntType nValue) {
+template<typename Type>
+bool Object::Table::SetValue(size_t nRow, size_t nCol, Type nValue) {
 	if (GetColumnCount() <= nCol || GetRowCount() <= nRow) {
 		return false;
 	}
 	size_t nStartPos = m_mapStartPos[nCol];
 	size_t nColLen = m_mapColLen[nCol];
-	if (nColLen != sizeof(IntType)) {
+	if (nColLen != sizeof(Type)) {
 		return false;
 	}
 	TableRow& row = m_rows[nRow];
-	tools::SafeMemcpy(row.pBlob + nStartPos, row.nBlobLen - nStartPos, &nValue, sizeof(IntType));
+	tools::SafeMemcpy(row.pBlob + nStartPos, row.nBlobLen - nStartPos, &nValue, sizeof(Type));
 	return true;
 }
 
-template<typename IntType>
-bool Object::Table::GetValue(size_t nRow, size_t nCol, IntType& nValue) {
+template<typename Type>
+bool Object::Table::GetValue(size_t nRow, size_t nCol, Type& nValue) {
 	if (GetColumnCount() <= nCol || GetRowCount() <= nRow) {
 		return false;
 	}
 	size_t nStartPos = m_mapStartPos[nCol];
 	size_t nColLen = m_mapColLen[nCol];
-	if (nColLen != sizeof(IntType)) {
+	if (nColLen != sizeof(Type)) {
 		return false;
 	}
 	TableRow& row = m_rows[nRow];
