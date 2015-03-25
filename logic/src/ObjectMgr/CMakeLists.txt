@@ -36,3 +36,7 @@ ADD_LIBRARY(ObjectMgr SHARED
         ${TINYXML}
         ${PUBLIC}
         )
+
+TARGET_LINK_LIBRARIES(ObjectMgr 
+    debug ${PROTO_LIBRARY_DEBUG}
+    optimized ${PROTO_LIBRARY_RELEASE})

@@ -91,7 +91,7 @@ namespace tlib {
             return true;
         }
         
-        bool unbind(ID_TYPE id, void * t, member_fun paddress) {
+        bool unbind(ID_TYPE id, t * pObj, member_fun paddress) {
             typename BUNDLER_POOL::iterator pool_itor = m_bundler_pool.find(id);
             if (pool_itor == m_bundler_pool.end()) {
                 return false;
@@ -157,6 +157,12 @@ namespace tlib {
             }
             m_delete_list.clear();
         }
+
+        void clear() {
+            m_bundler_pool.clear();
+            m_delete_list.clear();
+        }
+
     private:
         BUNDLER_POOL m_bundler_pool;
         DELETE_LIST m_delete_list;

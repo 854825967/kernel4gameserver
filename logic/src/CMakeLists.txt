@@ -23,10 +23,13 @@ ENDIF(WIN32)
 SET(LOGIC_INTERFACE
     "${PROJECT_SOURCE_DIR}/logic/src/Interface/IGate.h"
     "${PROJECT_SOURCE_DIR}/logic/src/Interface/IObjectMgr.h"
+    "${PROJECT_SOURCE_DIR}/logic/src/Interface/IConnectionSink.h"
     )
     
 SET(LOGIC_DEFINE
     "${PROJECT_SOURCE_DIR}/logic/src/Define/ProtocolID.h"
+    "${PROJECT_SOURCE_DIR}/logic/src/Define/demo.pb.h"
+    "${PROJECT_SOURCE_DIR}/logic/src/Define/demo.pb.cc"
     )
 
 ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/logic/src/Gate)

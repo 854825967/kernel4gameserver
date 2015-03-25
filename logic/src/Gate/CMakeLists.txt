@@ -12,8 +12,8 @@ INCLUDE_DIRECTORIES(
 SET(GATE
     "${PROJECT_SOURCE_DIR}/logic/src/Gate/Gate.h"
     "${PROJECT_SOURCE_DIR}/logic/src/Gate/Gate.cpp"
-    "${PROJECT_SOURCE_DIR}/logic/src/Gate/ClientConnectSick.h"
-    "${PROJECT_SOURCE_DIR}/logic/src/Gate/ClientConnectSick.cpp"
+    "${PROJECT_SOURCE_DIR}/logic/src/Gate/ClientConnectSink.h"
+    "${PROJECT_SOURCE_DIR}/logic/src/Gate/ClientConnectSink.cpp"
     "${PROJECT_SOURCE_DIR}/logic/src/Gate/main.cpp"
     )
     

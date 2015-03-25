@@ -31,18 +31,19 @@ void  protobuf_AddDesc_demo_2eproto();
 void protobuf_AssignDesc_demo_2eproto();
 void protobuf_ShutdownFile_demo_2eproto();
 
-class Demo;
+class DemoClientReq;
+class DemoServerAsk;
 
 // ===================================================================
 
-class Demo : public ::google::protobuf::Message {
+class DemoClientReq : public ::google::protobuf::Message {
  public:
-  Demo();
-  virtual ~Demo();
+  DemoClientReq();
+  virtual ~DemoClientReq();
 
-  Demo(const Demo& from);
+  DemoClientReq(const DemoClientReq& from);
 
-  inline Demo& operator=(const Demo& from) {
+  inline DemoClientReq& operator=(const DemoClientReq& from) {
     CopyFrom(from);
     return *this;
   }
@@ -56,17 +57,17 @@ class Demo : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const Demo& default_instance();
+  static const DemoClientReq& default_instance();
 
-  void Swap(Demo* other);
+  void Swap(DemoClientReq* other);
 
   // implements Message ----------------------------------------------
 
-  Demo* New() const;
+  DemoClientReq* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Demo& from);
-  void MergeFrom(const Demo& from);
+  void CopyFrom(const DemoClientReq& from);
+  void MergeFrom(const DemoClientReq& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -89,120 +90,273 @@ class Demo : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required int32 ID = 1;
-  inline bool has_id() const;
-  inline void clear_id();
-  static const int kIDFieldNumber = 1;
-  inline ::google::protobuf::int32 id() const;
-  inline void set_id(::google::protobuf::int32 value);
+  // required string text = 1;
+  inline bool has_text() const;
+  inline void clear_text();
+  static const int kTextFieldNumber = 1;
+  inline const ::std::string& text() const;
+  inline void set_text(const ::std::string& value);
+  inline void set_text(const char* value);
+  inline void set_text(const char* value, size_t size);
+  inline ::std::string* mutable_text();
+  inline ::std::string* release_text();
+  inline void set_allocated_text(::std::string* text);
 
-  // repeated string context = 2;
-  inline int context_size() const;
-  inline void clear_context();
-  static const int kContextFieldNumber = 2;
-  inline const ::std::string& context(int index) const;
-  inline ::std::string* mutable_context(int index);
-  inline void set_context(int index, const ::std::string& value);
-  inline void set_context(int index, const char* value);
-  inline void set_context(int index, const char* value, size_t size);
-  inline ::std::string* add_context();
-  inline void add_context(const ::std::string& value);
-  inline void add_context(const char* value);
-  inline void add_context(const char* value, size_t size);
-  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& context() const;
-  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_context();
-
-  // @@protoc_insertion_point(class_scope:Demo)
+  // @@protoc_insertion_point(class_scope:DemoClientReq)
  private:
-  inline void set_has_id();
-  inline void clear_has_id();
+  inline void set_has_text();
+  inline void clear_has_text();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::google::protobuf::RepeatedPtrField< ::std::string> context_;
-  ::google::protobuf::int32 id_;
+  ::std::string* text_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
 
   friend void  protobuf_AddDesc_demo_2eproto();
   friend void protobuf_AssignDesc_demo_2eproto();
   friend void protobuf_ShutdownFile_demo_2eproto();
 
   void InitAsDefaultInstance();
-  static Demo* default_instance_;
+  static DemoClientReq* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class DemoServerAsk : public ::google::protobuf::Message {
+ public:
+  DemoServerAsk();
+  virtual ~DemoServerAsk();
+
+  DemoServerAsk(const DemoServerAsk& from);
+
+  inline DemoServerAsk& operator=(const DemoServerAsk& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const DemoServerAsk& default_instance();
+
+  void Swap(DemoServerAsk* other);
+
+  // implements Message ----------------------------------------------
+
+  DemoServerAsk* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const DemoServerAsk& from);
+  void MergeFrom(const DemoServerAsk& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required string text = 1;
+  inline bool has_text() const;
+  inline void clear_text();
+  static const int kTextFieldNumber = 1;
+  inline const ::std::string& text() const;
+  inline void set_text(const ::std::string& value);
+  inline void set_text(const char* value);
+  inline void set_text(const char* value, size_t size);
+  inline ::std::string* mutable_text();
+  inline ::std::string* release_text();
+  inline void set_allocated_text(::std::string* text);
+
+  // @@protoc_insertion_point(class_scope:DemoServerAsk)
+ private:
+  inline void set_has_text();
+  inline void clear_has_text();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::std::string* text_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+
+  friend void  protobuf_AddDesc_demo_2eproto();
+  friend void protobuf_AssignDesc_demo_2eproto();
+  friend void protobuf_ShutdownFile_demo_2eproto();
+
+  void InitAsDefaultInstance();
+  static DemoServerAsk* default_instance_;
 };
 // ===================================================================
 
 
 // ===================================================================
 
-// Demo
+// DemoClientReq
 
-// required int32 ID = 1;
-inline bool Demo::has_id() const {
+// required string text = 1;
+inline bool DemoClientReq::has_text() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void Demo::set_has_id() {
+inline void DemoClientReq::set_has_text() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void Demo::clear_has_id() {
+inline void DemoClientReq::clear_has_text() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void Demo::clear_id() {
-  id_ = 0;
-  clear_has_id();
+inline void DemoClientReq::clear_text() {
+  if (text_ != &::google::protobuf::internal::kEmptyString) {
+    text_->clear();
+  }
+  clear_has_text();
 }
-inline ::google::protobuf::int32 Demo::id() const {
-  return id_;
+inline const ::std::string& DemoClientReq::text() const {
+  return *text_;
 }
-inline void Demo::set_id(::google::protobuf::int32 value) {
-  set_has_id();
-  id_ = value;
+inline void DemoClientReq::set_text(const ::std::string& value) {
+  set_has_text();
+  if (text_ == &::google::protobuf::internal::kEmptyString) {
+    text_ = new ::std::string;
+  }
+  text_->assign(value);
+}
+inline void DemoClientReq::set_text(const char* value) {
+  set_has_text();
+  if (text_ == &::google::protobuf::internal::kEmptyString) {
+    text_ = new ::std::string;
+  }
+  text_->assign(value);
+}
+inline void DemoClientReq::set_text(const char* value, size_t size) {
+  set_has_text();
+  if (text_ == &::google::protobuf::internal::kEmptyString) {
+    text_ = new ::std::string;
+  }
+  text_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* DemoClientReq::mutable_text() {
+  set_has_text();
+  if (text_ == &::google::protobuf::internal::kEmptyString) {
+    text_ = new ::std::string;
+  }
+  return text_;
+}
+inline ::std::string* DemoClientReq::release_text() {
+  clear_has_text();
+  if (text_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = text_;
+    text_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void DemoClientReq::set_allocated_text(::std::string* text) {
+  if (text_ != &::google::protobuf::internal::kEmptyString) {
+    delete text_;
+  }
+  if (text) {
+    set_has_text();
+    text_ = text;
+  } else {
+    clear_has_text();
+    text_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
 }
 
-// repeated string context = 2;
-inline int Demo::context_size() const {
-  return context_.size();
+// -------------------------------------------------------------------
+
+// DemoServerAsk
+
+// required string text = 1;
+inline bool DemoServerAsk::has_text() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void Demo::clear_context() {
-  context_.Clear();
+inline void DemoServerAsk::set_has_text() {
+  _has_bits_[0] |= 0x00000001u;
 }
-inline const ::std::string& Demo::context(int index) const {
-  return context_.Get(index);
+inline void DemoServerAsk::clear_has_text() {
+  _has_bits_[0] &= ~0x00000001u;
 }
-inline ::std::string* Demo::mutable_context(int index) {
-  return context_.Mutable(index);
+inline void DemoServerAsk::clear_text() {
+  if (text_ != &::google::protobuf::internal::kEmptyString) {
+    text_->clear();
+  }
+  clear_has_text();
 }
-inline void Demo::set_context(int index, const ::std::string& value) {
-  context_.Mutable(index)->assign(value);
+inline const ::std::string& DemoServerAsk::text() const {
+  return *text_;
 }
-inline void Demo::set_context(int index, const char* value) {
-  context_.Mutable(index)->assign(value);
+inline void DemoServerAsk::set_text(const ::std::string& value) {
+  set_has_text();
+  if (text_ == &::google::protobuf::internal::kEmptyString) {
+    text_ = new ::std::string;
+  }
+  text_->assign(value);
 }
-inline void Demo::set_context(int index, const char* value, size_t size) {
-  context_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
+inline void DemoServerAsk::set_text(const char* value) {
+  set_has_text();
+  if (text_ == &::google::protobuf::internal::kEmptyString) {
+    text_ = new ::std::string;
+  }
+  text_->assign(value);
 }
-inline ::std::string* Demo::add_context() {
-  return context_.Add();
+inline void DemoServerAsk::set_text(const char* value, size_t size) {
+  set_has_text();
+  if (text_ == &::google::protobuf::internal::kEmptyString) {
+    text_ = new ::std::string;
+  }
+  text_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline void Demo::add_context(const ::std::string& value) {
-  context_.Add()->assign(value);
+inline ::std::string* DemoServerAsk::mutable_text() {
+  set_has_text();
+  if (text_ == &::google::protobuf::internal::kEmptyString) {
+    text_ = new ::std::string;
+  }
+  return text_;
 }
-inline void Demo::add_context(const char* value) {
-  context_.Add()->assign(value);
+inline ::std::string* DemoServerAsk::release_text() {
+  clear_has_text();
+  if (text_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = text_;
+    text_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
-inline void Demo::add_context(const char* value, size_t size) {
-  context_.Add()->assign(reinterpret_cast<const char*>(value), size);
-}
-inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
-Demo::context() const {
-  return context_;
-}
-inline ::google::protobuf::RepeatedPtrField< ::std::string>*
-Demo::mutable_context() {
-  return &context_;
+inline void DemoServerAsk::set_allocated_text(::std::string* text) {
+  if (text_ != &::google::protobuf::internal::kEmptyString) {
+    delete text_;
+  }
+  if (text) {
+    set_has_text();
+    text_ = text;
+  } else {
+    clear_has_text();
+    text_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
 }
 
 

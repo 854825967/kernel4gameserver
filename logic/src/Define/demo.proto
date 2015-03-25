@@ -1,4 +1,7 @@
-message Demo{
-    required int32 ID=1;
-    repeated string context=2;
+message DemoClientReq {
+    required string text=1;
 };
+
+message DemoServerAsk {
+    required string text=1;
+}
