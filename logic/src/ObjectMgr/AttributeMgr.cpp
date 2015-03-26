@@ -91,6 +91,18 @@ bool CAttributeMgr::LoadConfig(const string& objType)
 		if (eleAttr->Attribute("type"))
 			info.type = GetType(eleAttr->Attribute("type"));
 
+		if (strAttrName.empty()) {
+			return false;
+		}
+
+		ATTR_CONFIG* pBaseConf = pBaseConfig;
+		while (pBaseConf) {
+			if (pBaseConf->mapAttrInfo.find(strAttrName) != pBaseConf->mapAttrInfo.end()) {
+				return false;
+			}
+			pBaseConf = GetAttrConfig(pBaseConf->strBaseType);
+		}
+
 		switch (info.type)
 		{
 		case DATA_TYPE_S8:

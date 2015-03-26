@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<monster>
-  <attr name="objtype" type="s8" desc="对象类别"/>
-  <attr name="outlook" type="s16" desc="怪物外观"/>
-  <attr name="monstername" type="string" length="32" desc="怪物名"/>
-  <attr name="attack" type="s32" desc="攻击力"/>
-  <attr name="defence" type="s32" desc="防御力"/>
-  <attr name="maxhp" type="s32" desc="最大生命值"/>
-  <attr name="maxmp" type="s32" desc="最大能量值"/>
-  <attr name="hp" type="s32" desc="当前生命值"/>
-  <attr name="mp" type="s32" desc="当前能量值"/>
-  <attr name="atkspeed" type="s8" desc="攻击速度"/>
-  <attr name="movespeed" type="s8" desc="移动速度"/>
-  <attr name="atkrange" type="s8" desc="攻击范围"/>
-  <attr name="moverange" type="s8" desc="移动范围"/>
-</monster>
+<Monster base="Creature">
+  <attr name="monster_name" type="string" length="32" desc="怪物名"/>
+  <attr name="monster_renewhp" type="s32" desc="生命回复速度"/>
+  <attr name="monster_renewmp" type="s32" desc="能量回复速度"/>
+  <attr name="monster_atkrange" type="s8" desc="攻击范围"/>
+  <attr name="monster_moverange" type="s8" desc="移动范围"/>
+  <attr name="monster_burstrate" type="s32" desc="爆物品概率"/>
+  <attr name="monster_burstobject" type="s32" desc="所爆出的物品id"/>
+</Monster>
