@@ -5,10 +5,14 @@
 IF(UNIX)
     SET(LIBRARY_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build/linux")
     SET(PROTO_LIBRARY_DEBUG
-        "${PROJECT_SOURCE_DIR}/thirdlibrary/libprotobuf/libprotobuf_debug.a")
+        "libprotobuf.a")
 
     SET(PROTO_LIBRARY_RELEASE
-        "${PROJECT_SOURCE_DIR}/thirdlibrary/libprotobuf/libprotobuf_release.a")
+        "libprotobuf.a")
+
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lprotobuf")
+    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -lprotobuf")
+    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -lprotobuf")
 ENDIF(UNIX)
 
 IF(WIN32)
@@ -27,7 +31,6 @@ SET(LOGIC_INTERFACE
     )
     
 SET(LOGIC_DEFINE
-    "${PROJECT_SOURCE_DIR}/logic/src/Define/ProtocolID.h"
     "${PROJECT_SOURCE_DIR}/logic/src/Define/demo.pb.h"
     "${PROJECT_SOURCE_DIR}/logic/src/Define/demo.pb.cc"
     )

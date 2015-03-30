@@ -27,10 +27,10 @@ namespace tlib {
 
         struct type_info {
             type unit;
-            const s32 size;
+            const s32 len;
             s8 status;
 
-            type_info() : size(sizeof(type_info)) {
+            type_info() : len(sizeof(type_info)) {
                 status = IS_FREE;
             }
 
@@ -45,7 +45,10 @@ namespace tlib {
                 TASSERT(m_pLock, "new faild");
             }
 
+            
+            POOL_OPT_LOCK(lock, m_pLock);
             AllocNewBlob();
+            POOL_OPT_FREELOCK(lock, m_pLock);
         }
 
         ~TPool() {
@@ -78,7 +81,7 @@ namespace tlib {
 
             if (itor != m_list.end()) {
                 p = (type *)*itor;
-                TASSERT((*itor)->status == IS_FREE && (*itor)->size == sizeof(type_info), "wtf");
+                TASSERT((*itor)->status == IS_FREE && (*itor)->len == sizeof(type_info), "wtf");
                 (*itor)->status = IN_USE;
                 m_list.erase(itor);
             }
@@ -138,7 +141,6 @@ namespace tlib {
     private:
 
         void AllocNewBlob() {
-            POOL_OPT_LOCK(lock, m_pLock);
             if (m_pUnitAry == NULL) {
                 TASSERT(m_sBlockCount == 0, "pool bug");
                 m_pUnitAry = NEW type_info*;
@@ -155,11 +157,10 @@ namespace tlib {
                 m_list.push_back(m_pUnitAry[m_sBlockCount] + i);
             }
             m_sBlockCount += 1;
-            POOL_OPT_FREELOCK(lock, m_pLock);
         }
 
         bool CheckAddr(type * pUnit) {
-            return ((type_info *)pUnit)->size == sizeof(type_info);
+            return ((type_info *)pUnit)->len == sizeof(type_info);
         }
 
     private:

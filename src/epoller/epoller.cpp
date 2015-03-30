@@ -1,24 +1,19 @@
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include "Tools.h"
-#include "epoller.h"
-#include "epoll_waiter.h"
-#include "epoll_worker.h"
-#include "configmgr/Configmgr.h"
 #include "Kernel.h"
+#include "epoller.h"
+#include "configmgr/Configmgr.h"
+#include "epoller_worker.h"
 using namespace tcore;
 
-tlib::TPool<struct epoller_data, true, 128> g_EpollerDataPool;
+tlib::TPool<struct epoller_event, true, 128> g_EpollerDataPool;
 
-epoller::epoller() {
-    m_epoll = 0;
-    m_nWorkerCount = 0;
+epoller::epoller() : m_epollfd(-1), m_nWorkerCount(0) {
+
 }
 
 epoller::~epoller() {
-    if (m_epoll != 0) {
-        shut_socket(m_epoll);
+    if (m_epollfd != -1) {
+        shut_socket(m_epollfd);
     }
 }
 
@@ -42,64 +37,76 @@ bool epoller::Redry() {
 }
 
 bool epoller::Initialize() {
-    s32 count = Configmgr::getInstance()->GetCoreConfig()->sNetThdCount;
+    m_nWorkerCount = Configmgr::getInstance()->GetCoreConfig()->sNetThdCount;
 
-    if (m_epoll != 0) {
+    if (m_epollfd != -1) {
         ECHO("epoll is created");
         return false;
     }
 
-    m_epoll = epoll_create(EPOLL_DESC_COUNT);
-    if (-1 == m_epoll) {
+    m_epollfd = epoll_create(EPOLL_DESC_COUNT);
+    if (-1 == m_epollfd) {
         ECHO("create epoll error %s", strerror(errno));
-        m_epoll = 0;
+        m_epollfd = -1;
         return false;
     }
 
-    ECHO("epoll fd %d", m_epoll);
-
-    m_nWorkerCount = count;
-    m_pWorkerAry = NEW epoll_worker[count];
-    m_pWaiter = NEW epoll_waiter;
-
-    m_pWaiter->SetEpoller(this);
-    m_pWaiter->Start();
-
-    for (s32 i = 0; i < count; i++) {
-        m_pWorkerAry[i].SetEpoller(this);
+    m_pWorkerAry = NEW epoller_worker[m_nWorkerCount];
+    TASSERT(m_pWorkerAry, "wtf");
+    for (s32 i=0; i<m_nWorkerCount; i++) {
+        bool res = m_pWorkerAry[i].Initialize();
+        TASSERT(res, "wtf");
         m_pWorkerAry[i].Start();
     }
-
+    
     return true;
 }
 
 bool epoller::Destory() {
+    if (m_pWorkerAry) {
+        for (s32 i=0; i<m_nWorkerCount; i++) {
+            m_pWorkerAry[i].Terminate();
+        }
+        delete[] m_pWorkerAry;
+    }
+    
     delete this;
     return true;
 }
 
-void epoller::Run() {
-
+epoller_worker * epoller::BalancingWorker()  {
+    epoller_worker * pWorker = NULL;
+    if (m_pWorkerAry) {
+        pWorker = m_pWorkerAry;
+        for (s32 i=1; i<m_nWorkerCount; i++) {
+            if (m_pWorkerAry[i].GetSocketHandlerCount() < pWorker->GetSocketHandlerCount()) {
+                pWorker = &(m_pWorkerAry[i]);
+            }
+        }
+        
+    }
+    
+    return pWorker;
 }
 
 bool epoller::AddServer(ITcpServer * server) {
     if ((server->socket_handler = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        ECHO("socket error %s", strerror(errno));
+        TASSERT(false, "socket error %s", strerror(errno));
         return false;
     }
 
     struct timeval tv;
     if (0 != setsockopt(server->socket_handler, SOL_SOCKET, SO_REUSEADDR, (const char*) &tv, sizeof (tv))) {
-        ECHO("setsockopt error %s", strerror(errno));
+        TASSERT(false, "setsockopt error %s", strerror(errno));
         return false;
     }
 
     if (!setnonblocking(server->socket_handler)) {
-        ECHO("setnonbolocking error %s", strerror(errno));
+        TASSERT(false, "setnonbolocking error %s", strerror(errno));
         return false;
     }
 
-    epoller_data * p = g_EpollerDataPool.Create();
+    epoller_event * p = g_EpollerDataPool.Create();
     p->opt = SO_ACCEPT;
     p->user_ptr = server;
 
@@ -126,7 +133,7 @@ bool epoller::AddServer(ITcpServer * server) {
         return false;
     }
 
-    s32 res = epoll_ctl(m_epoll, EPOLL_CTL_ADD, server->socket_handler, &ev);
+    s32 res = epoll_ctl(m_epollfd, EPOLL_CTL_ADD, server->socket_handler, &ev);
     TASSERT(res == 0, strerror(errno));
 
     return true;
@@ -168,7 +175,7 @@ bool epoller::AddClient(ITcpSocket * client) {
         ECHO("connect error %s", strerror(errno));
         return false;
     } else {
-        epoller_data * p = g_EpollerDataPool.Create();
+        epoller_event * p = g_EpollerDataPool.Create();
         p->opt = SO_CONNECT;
         p->user_ptr = client;
 
@@ -176,71 +183,62 @@ bool epoller::AddClient(ITcpSocket * client) {
         ev.data.ptr = p;
         ev.events = EPOLLOUT | EPOLLET;
 
-        s32 res = epoll_ctl(m_epoll, EPOLL_CTL_ADD, client->socket_handler, &ev);
+        s32 res = epoll_ctl(m_epollfd, EPOLL_CTL_ADD, client->socket_handler, &ev);
         TASSERT(res == 0, strerror(errno));
     }
 
     return true;
 }
 
-void epoller::AddEvent(struct epoller_data * data) {
-    m_pWorkerAry[data->index % m_nWorkerCount].AddWork(data);
-}
+s64 epoller::DealEvent(s64 overtime) {
+    s64 lTick = tools::GetTimeMillisecond();
+    epoll_event events[EPOLLER_EVENTS_COUNT];
 
-void epoller::AddIO(struct epoller_data * data) {
-    m_oIOQueue.Add(data);
+    memset(&events, 0, sizeof(events));    
+    errno = 0;
+    int retCount = epoll_wait(m_epollfd, events, EPOLLER_EVENTS_COUNT, 5);
+    if (retCount == -1) {
+        TASSERT(errno == EINTR, "epoll_wait err! %s", strerror(errno));
+        return tools::GetTimeMillisecond() - lTick;
+    }
+
+    for (s32 i=0; i<retCount; i++) {
+        epoller_event * p = (epoller_event *)events[i].data.ptr;
+        p->flags = events[i].events;
+        switch (p->opt) {
+            case tcore::SO_ACCEPT:
+            {
+                ITcpServer * pServer = (ITcpServer *)p->user_ptr;
+                pServer->DoAccept(p, this);
+                break;
+            }
+            case tcore::SO_CONNECT:
+            {
+                ITcpSocket * pClient = (ITcpSocket *)p->user_ptr;
+                epoll_ctl(m_epollfd, EPOLL_CTL_DEL, pClient->socket_handler, NULL);
+                pClient->DoConnect(p, this);
+                g_EpollerDataPool.Recover(p);
+                break;
+            }
+            default:
+                TASSERT(false, "wtf");
+                break;
+        }
+    }
+    
+    return tools::GetTimeMillisecond() - lTick;
 }
 
 s64 epoller::DonetIO(s64 overtime) {
     s64 lTick = tools::GetTimeMillisecond();
+    s64 lUser = tools::GetTimeMillisecond();
 
-    epoller_data * p;
-    while (true) {
-        if (m_oIOQueue.Read(p)) {
-            switch (p->opt) {
-                case SO_ACCEPT:
-                {
-                    ITcpServer * server = (ITcpServer *) p->user_ptr;
-                    server->DoAccept(p->flags, this);
-                    break;
-                }
-                case SO_CONNECT:
-                {
-                    ITcpSocket * client = (ITcpSocket *) p->user_ptr;
-                    client->DoConnect(p->flags, this);
-                    g_EpollerDataPool.Recover(p);
-                    break;
-                }
-                case SO_TCPRECV:
-                {
-                    ITcpSocket * client = (ITcpSocket *) p->user_ptr;
-                    //client->Error(Kernel::getInstance(), );
-                    if (p->code != -1 && p->len != 0) {
-                        s32 use_size;
-                        client->m_recvStream.LockRead();
-                        use_size = client->Recv(Kernel::getInstance(), (void *) client->m_recvStream.buff(), client->m_recvStream.size());
-                        client->m_recvStream.FreeRead();
-                        client->m_recvStream.out(use_size);
-                    } else {
-                        client->Disconnect(Kernel::getInstance());
-                    }
-
-                    g_EpollerDataPool.Recover(p);
-
-                    break;
-                }
-            }
-
-        } else if (m_oIOQueue.IsEmpty()) {
-            return tools::GetTimeMillisecond() - lTick;
-        }
-
-        s64 lDoneTick = tools::GetTimeMillisecond() - lTick;
-        if (lDoneTick >= overtime) {
-            return overtime - lDoneTick;
-        }
+    DealEvent(overtime/(m_nWorkerCount + 1));
+    
+    for (s32 i=0; i<m_nWorkerCount; i++) {
+        m_pWorkerAry[i].DealEvent(overtime/(m_nWorkerCount + 1));
     }
-
+    
     return 0;
 }
 

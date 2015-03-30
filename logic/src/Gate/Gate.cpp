@@ -14,8 +14,8 @@ bool Gate::Initialize(IKernel * pKernel) {
 }
 
 bool Gate::Launched(IKernel * pKernel) {
-	InitAddr("0.0.0.0", 12580);
-	pKernel->StartTcpServer(this);
+    InitAddr("0.0.0.0", 12580);
+    pKernel->StartTcpServer(this);
 
     pKernel->StartTimer(1000, this, 2000);
 

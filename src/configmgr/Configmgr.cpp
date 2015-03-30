@@ -18,7 +18,7 @@ Configmgr::~Configmgr() {
 }
 
 IConfigmgr * Configmgr::getInstance() {
-    static IConfigmgr * p = NULL;
+    static Configmgr * p = NULL;
     if (NULL == p) {
         p = NEW Configmgr;
         if (!p->Redry()) {

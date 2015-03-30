@@ -13,9 +13,12 @@
 #include "ProtocolID.pb.h"
 using namespace tcore;
 
+static s32 i = 0;
+
 class ClientConnectSink : public IConnectionSink {
 public:
     virtual void OnConnected(tcore::IKernel * pKernel) {
+        ECHO("connected link count %d", ++i);
         RGS_MSG_CALL(CLIENT_MSG_CHOOSE_SERVER_REQ, ClientConnectSink::OnClientTest);
     }
 
@@ -24,26 +27,27 @@ public:
     }
 
     virtual void OnConnectionBreak(tcore::IKernel * pKernel) {
-
+        ECHO_TRACE("connection break cout %d", --i);
+        delete this;
     }
 
     virtual void OnClientTest(tcore::IKernel *, const s32 nMsgID, const void * pContext, const s32 nSize) {
-        DemoClientReq req;
-        if ( !req.ParseFromString(string((const char *)pContext)) ) {
-            ECHO_ERROR("error msg format, msg id : %d", nMsgID);
-            return;
-        }
-
-        ECHO("client msg:%s", req.text().c_str());
-        DemoServerAsk ask;
-        ask.set_text("come on baby");
-        string buff;
-        ask.SerializeToString(&buff);
-        SendMSG(SERVER_MSG_CHOOSE_SERVER_ASK, buff.c_str(), buff.size());
+        ECHO("%s", (const char *)pContext);
+//        DemoClientReq req;
+//        if ( !req.ParseFromString(string((const char *)pContext)) ) {
+//            ECHO_ERROR("error msg format, msg id : %d", nMsgID);
+//            return;
+//        }
+//
+//        ECHO("client msg:%s", req.text().c_str());
+//        DemoServerAsk ask;
+//        ask.set_text("come on baby");
+//        string buff;
+//        ask.SerializeToString(&buff);
+//        SendMSG(SERVER_MSG_CHOOSE_SERVER_ASK, buff.c_str(), buff.size());
     }
 
 private:
-
 };
 
 #endif	/* __ClientConnectSick_h_ */

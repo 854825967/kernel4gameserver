@@ -1,192 +1,120 @@
 #include "IKernel.h"
 #include "epoller.h"
+#include "epoller_worker.h"
 #include "Kernel.h"
+#include "configmgr/Configmgr.h"
 #include <arpa/inet.h>
 namespace tcore {
-
     static s32 s_index = 0;
-
-    void ITcpSocket::DoIO(s32 flags, void* pContext) {
-        epoller * pEpoller = (epoller *) pContext;
-
-        if (m_nStatus == SS_WAITCLOSE) {
-            shutdown(socket_handler, SHUT_RD);
-        }
-
-        if (flags & EPOLLIN && m_nStatus == SS_ESTABLISHED) {
+    void ITcpSocket::DoIO(void * p, void* pContext) {
+        epoller_event * pEvent = (epoller_event *)p;
+        epoller_worker * pWoker = (epoller_worker *) pContext;
+        TASSERT(m_nStatus != SS_UNINITIALIZE, "wtf");
+        if ((pEvent->flags & EPOLLIN) && SS_ESTABLISHED == m_nStatus) {
             //read
-            char buff[RECV_BUFF_LEN];
+            const s32 nReadSize = Configmgr::getInstance()->GetCoreConfig()->sNetRecvSize;
+            char buff[nReadSize];
             memset(buff, 0, sizeof (buff));
             s32 recvLen = 0;
-            bool bRecv = false;
-            bool bError = false;
-            bool bClose = false;
-            while (true) {
-                memset(buff, 0, sizeof (buff));
-                s32 len = recv(socket_handler, buff, RECV_BUFF_LEN, 0);
+
+            while (SS_ESTABLISHED == m_nStatus) {
+                s32 len = recv(socket_handler, buff, nReadSize, 0);
                 if (len < 0 && errno == EAGAIN) {
-                    //no buff for read
                     break;
                 }
 
-                if (m_nStatus == SS_WAITCLOSE) {
-                    break;
-                }
-
-                if (len < 0) {
-                    bError = true;
-                    ECHO("recv error %s", strerror(errno));
-                    m_nStatus = SS_UNINITIALIZE;
-                    pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
-                    shut_socket(socket_handler);
-                    break;
-                } else if (len == 0) {
-                    bClose = true;
-                    //socket closed
-                    m_nStatus = SS_UNINITIALIZE;
-                    pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
-                    shut_socket(socket_handler);
+                if (len <= 0) {
+                    ECHO("link over or recv error %s", strerror(errno));
+                    m_nStatus = SS_WAITCLOSE;
                     break;
                 } else {
-                    bRecv = true;
                     recvLen += len;
                     m_recvStream.in(buff, len);
                 }
             }
 
-            if (bRecv) {
-                epoller_data * p = g_EpollerDataPool.Create();
+            if (recvLen > 0) {
+                epoller_event * p = g_EpollerDataPool.Create();
                 p->opt = SO_TCPRECV;
                 p->user_ptr = this;
                 p->code = 0;
                 p->len = recvLen;
-                pEpoller->AddIO(p);
+                pWoker->AddEvent(p);
             }
-
-            if (bClose) {
-                epoller_data * p = g_EpollerDataPool.Create();
-                p->opt = SO_TCPRECV;
-                p->user_ptr = this;
-                p->code = 0;
-                p->len = 0;
-                pEpoller->AddIO(p);
-                return;
-            }
-
-            if (bError) {
-                epoller_data * p = g_EpollerDataPool.Create();
-                p->opt = SO_TCPRECV;
-                p->user_ptr = this;
-                p->code = -1;
-                p->len = 0;
-                pEpoller->AddIO(p);
-                return;
-            }
-
         }
 
-        if (flags & EPOLLOUT && m_nStatus != SS_UNINITIALIZE) {
+        //send
+        if ( (pEvent->flags & EPOLLOUT) && m_nStatus != SS_UNINITIALIZE) {
+            s32 nSendLen = Configmgr::getInstance()->GetCoreConfig()->sNetSendSize;
             //write
             while (m_sendStream.size() > 0) {
                 m_sendStream.LockWrite();
-                s32 sendlen = send(socket_handler, m_sendStream.buff(), m_sendStream.size(), 0);
+                s32 sendlen = send(socket_handler, m_sendStream.buff(), nSendLen, 0);
                 m_sendStream.FreeWrite();
                 if (sendlen > 0) {
-                    //ECHO("send buff len %d", sendlen);
                     m_sendStream.out(sendlen);
+                    if (m_sendStream.size() == 0 && m_nStatus == SS_WAITCLOSE) {
+                        TASSERT(false, "send error");
+                        pWoker->SendDisconnectEvent(pEvent);
+                        return;
+                    }
                 } else if (sendlen == -1) {
                     if (EAGAIN == errno) {
                         break;
                     }
 
-                    if (ECONNRESET == errno) {
-                        TASSERT(false, "send error");
-                        epoller_data * p = g_EpollerDataPool.Create();
-                        p->opt = SO_TCPRECV;
-                        p->user_ptr = this;
-                        p->code = -1;
-                        p->len = 0;
-                        m_nStatus = SS_UNINITIALIZE;
-                        pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
-                        shut_socket(socket_handler);
-                        pEpoller->AddIO(p);
-                        return;
-                    }
+                    pWoker->SendDisconnectEvent(pEvent);
+                    return;
                 }
             }
-
-            if (m_sendStream.size() == 0 && m_nStatus == SS_WAITCLOSE) {
-                ECHO("tcpsocket closed");
-                epoller_data * p = g_EpollerDataPool.Create();
-                p->opt = SO_TCPRECV;
-                p->user_ptr = this;
-                p->code = 0;
-                p->len = 0;
-                m_nStatus = SS_UNINITIALIZE;
-                pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
-                shut_socket(socket_handler);
-                pEpoller->AddIO(p);
-                return;
+            
+            if (m_sendStream.size() == 0) {
+                if (m_nStatus == SS_WAITCLOSE) {
+                    pWoker->SendDisconnectEvent(pEvent);
+                }
             }
         }
 
-        if ((flags & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) && m_nStatus != SS_UNINITIALIZE) {
+        if ((pEvent->flags & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) && m_nStatus != SS_UNINITIALIZE) {
             // error
             ECHO("io error %s", strerror(errno));
-            epoller_data * p = g_EpollerDataPool.Create();
-            p->opt = SO_TCPRECV;
-            p->user_ptr = this;
-            p->code = -1;
-            p->len = 0;
-            m_nStatus = SS_UNINITIALIZE;
-            pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
-            shut_socket(socket_handler);
-            pEpoller->AddIO(p);
+            pWoker->SendDisconnectEvent(pEvent);
         }
     }
 
-    void ITcpSocket::DoConnect(s32 flags, void* pContext) {
+    void ITcpSocket::DoConnect(void * p, void* pContext) {
         epoller * pEpoller = (epoller *) pContext;
+        epoller_event * pEvent = (epoller_event *)p;
         s32 status = -1;
         socklen_t slen;
-        if (!(flags & EPOLLOUT)
+        if (!(pEvent->flags & EPOLLOUT)
                 || 0 > getsockopt(socket_handler, SOL_SOCKET, SO_ERROR, &status, &slen)
                 || 0 != status) {
-            ECHO("getsockopt error %s", strerror(errno));
-            Error(Kernel::getInstance(), SO_CONNECT, NULL, "connected failed");
-
-            bool res = pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
-            TASSERT(res, strerror(errno));
+            TASSERT(false, "getsockopt error %s", strerror(errno));
+            Error(Kernel::getInstance(), SO_CONNECT, NULL, strerror(errno));
             shut_socket(socket_handler);
         } else {
-//            ECHO("non-blocking connect success");
-            m_nStatus = SS_ESTABLISHED;
-            bool res = pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
-            TASSERT(res, strerror(errno));
-
-            epoller_data * data = g_EpollerDataPool.Create();
-            data->user_ptr = this;
-            data->opt = SO_TCPRECV;
-            data->index = s_index++;
-
-            epoll_event ev;
-            ev.events = EPOLLIN | EPOLLOUT;
-            ev.data.ptr = data;
-
-            res = pEpoller->epoller_CTL(EPOLL_CTL_ADD, socket_handler, &ev);
-            TASSERT(res, strerror(errno));
-            Connected(Kernel::getInstance());
+            //sth. must be deal
+            epoller_worker * pWorker = pEpoller->BalancingWorker();
+            if (pWorker->RelateSocketClient(this->socket_handler, this)) {
+                m_nStatus = SS_ESTABLISHED;
+                Connected(Kernel::getInstance());
+            } else {
+                TASSERT(false, "wtf");
+                Error(Kernel::getInstance(), SO_CONNECT, NULL, strerror(errno));
+            }
         }
-
+        g_EpollerDataPool.Recover(pEvent);
     }
 
-    void ITcpServer::DoAccept(s32 flags, void * pContext) {
+    void ITcpServer::DoAccept(void * p, void * pContext) {
         epoller * pEpoller = (epoller *) pContext;
-        if (flags == EPOLLIN) {
+        epoller_event * pEvent = (epoller_event *)p;
+        if (pEvent->flags == EPOLLIN) {
             struct sockaddr_in addr;
             socklen_t len = sizeof (addr);
-            s32 handler = accept(socket_handler, (sockaddr *) & addr, &len);
-            while (handler >= 0) {
+            s32 handler = -1;
+            while ( (handler = accept(socket_handler, (sockaddr *) & addr, &len) ) >= 0) {
                 if (setnonblocking(handler)) {
                     ITcpSocket * pSocket = MallocConnection(Kernel::getInstance());
                     TASSERT(pSocket, "tcpsocket point is null");
@@ -195,35 +123,25 @@ namespace tcore {
                     pSocket->port = ntohs(addr.sin_port);
                     pSocket->socket_handler = handler;
                     pSocket->m_nStatus = SS_ESTABLISHED;
-//                    ECHO("remote ip:%s port:%d", pSocket->ip, pSocket->port);
 
-                    epoller_data * data = g_EpollerDataPool.Create();
-                    data->user_ptr = pSocket;
-                    data->opt = SO_TCPRECV;
-                    data->index = s_index++;
-
-                    epoll_event ev;
-                    ev.events = EPOLLIN | EPOLLOUT;
-                    ev.data.ptr = data;
-
-                    bool res = pEpoller->epoller_CTL(EPOLL_CTL_ADD, pSocket->socket_handler, &ev);
-                    TASSERT(res, strerror(errno));
-                    pSocket->Connected(Kernel::getInstance());
+                    epoller_worker * pWorker = pEpoller->BalancingWorker();
+                    if (pWorker->RelateSocketClient(pSocket->socket_handler, pSocket)) {
+                        pSocket->Connected(Kernel::getInstance());
+                    } else {
+                        Error(Kernel::getInstance(), SO_ACCEPT, pSocket, "RelateSocketClient error");
+                        TASSERT(false, "wtf");
+                    }
                 } else {
                     ECHO("setnonblock error %s", strerror(errno));
                     shut_socket(handler);
                 }
-
-                handler = accept(socket_handler, (sockaddr *) & addr, &len);
             }
-
-//            ECHO("accept over");
         } else {
             ECHO("bad accept %s", strerror(errno));
-            Error(Kernel::getInstance(), SO_ACCEPT, NULL, "DoAccept error");
-            bool res = pEpoller->epoller_CTL(EPOLL_CTL_DEL, socket_handler, NULL);
-            TASSERT(res, strerror(errno));
+            pEpoller->remove_handler(socket_handler);
             shut_socket(socket_handler);
+            g_EpollerDataPool.Recover(pEvent);
+            Error(Kernel::getInstance(), SO_ACCEPT, NULL, "DoAccept error");
         }
     }
 }
