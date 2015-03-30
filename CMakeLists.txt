@@ -3,8 +3,8 @@
 #created:2015-01-12 15:07:04
 
 cmake_minimum_required(VERSION 2.8)
-
 PROJECT(T-Kernel)
+option(USE_32BITS "Compile for 32bits processors(linux only)" OFF)
 IF(UNIX)
     SET(CMAKE_CXX_FLAGS "-g -std=c++0x -Wall -lpthread -rdynamic -ldl -Dlinux -D_DEBUG")
     SET(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++0x -lpthread -rdynamic -ldl -Dlinux -D_DEBUG")
@@ -18,13 +18,12 @@ IF(WIN32)
     SET(CMAKE_C_FLAGS_RELEASE_INIT "/MT /Zm8192000 /O2 /Ob2 /D NDEBUG") 
     SET(CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "/MT /Zm8192000 /Zi /O2 /Ob1 /D NDEBUG")
     MESSAGE(STATUS "WINDOWS")
+    IF(CMAKE_CL_64)
+        MESSAGE(STATUS "x64")
+    ELSE()
+        MESSAGE(STATUS "x86")
+    ENDIF(CMAKE_CL_64)
 ENDIF(WIN32)
-
-IF(CMAKE_CL_64)
-    MESSAGE(STATUS "x64")
-ELSE()
-    MESSAGE(STATUS "x86")
-ENDIF(CMAKE_CL_64)
 
 INCLUDE_DIRECTORIES(
     "${PROJECT_SOURCE_DIR}/Public"
@@ -32,6 +31,7 @@ INCLUDE_DIRECTORIES(
     "${PROJECT_SOURCE_DIR}/src/"
     "${PROJECT_SOURCE_DIR}/src/interface"
     "${PROJECT_SOURCE_DIR}/src/epoller"
+    "${PROJECT_SOURCE_DIR}/src/iocper"
     )
 
 SET(TINYXML
@@ -83,11 +83,9 @@ SET(KERNEL_CONFIG_MGR
     )
 
 SET(KERNEL_EPOLLER
-    "${PROJECT_SOURCE_DIR}/src/epoller/header.h"
-    "${PROJECT_SOURCE_DIR}/src/epoller/epoll_waiter.h"
-    "${PROJECT_SOURCE_DIR}/src/epoller/epoll_waiter.cpp"
-    "${PROJECT_SOURCE_DIR}/src/epoller/epoll_worker.h"
-    "${PROJECT_SOURCE_DIR}/src/epoller/epoll_worker.cpp"
+    "${PROJECT_SOURCE_DIR}/src/epoller/epoller_header.h"
+    "${PROJECT_SOURCE_DIR}/src/epoller/epoller_worker.h"
+    "${PROJECT_SOURCE_DIR}/src/epoller/epoller_worker.cpp"
     "${PROJECT_SOURCE_DIR}/src/epoller/epoller.h"
     "${PROJECT_SOURCE_DIR}/src/epoller/epoller.cpp"
     "${PROJECT_SOURCE_DIR}/src/epoller/ITcpServer.cpp"

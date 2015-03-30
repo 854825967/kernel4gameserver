@@ -138,23 +138,23 @@ Object* ObjectMgr::FindObject(const OHandler& objh) {
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, s8 nValue) {
-	return SetAttr(hd, szAttrName, nValue);
+	return SetAttr<s8>(hd, szAttrName, nValue);
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, s16 nValue) {
-	return SetAttr(hd, szAttrName, nValue);
+	return SetAttr<s16>(hd, szAttrName, nValue);
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, s32 nValue) {
-	return SetAttr(hd, szAttrName, nValue);
+	return SetAttr<s32>(hd, szAttrName, nValue);
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, s64 nValue) {
-	return SetAttr(hd, szAttrName, nValue);
+	return SetAttr<s64>(hd, szAttrName, nValue);
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, double dValue) {
-	return SetAttr(hd, szAttrName, dValue);
+	return SetAttr<double>(hd, szAttrName, dValue);
 }
 
 bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, const char* szAttrValue, size_t nLen) {
@@ -178,23 +178,23 @@ bool ObjectMgr::SetAttr(const OHandler& hd, const char* szAttrName, const void* 
 }
 
 bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s8& nValue) {
-	return GetAttr(hd, szAttrName, nValue);
+	return GetAttr<s8>(hd, szAttrName, nValue);
 }
 
 bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s16& nValue) {
-	return GetAttr(hd, szAttrName, nValue);
+	return GetAttr<s16>(hd, szAttrName, nValue);
 }
 
 bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s32& nValue) {
-	return GetAttr(hd, szAttrName, nValue);
+	return GetAttr<s32>(hd, szAttrName, nValue);
 }
 
 bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, s64& nValue){
-	return GetAttr(hd, szAttrName, nValue);
+	return GetAttr<s64>(hd, szAttrName, nValue);
 }
 
 bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, double& dValue) {
-	return GetAttr(hd, szAttrName, dValue);
+	return GetAttr<double>(hd, szAttrName, dValue);
 }
 
 bool ObjectMgr::GetAttr(const OHandler& hd, const char* szAttrName, string& strValue) {
@@ -246,43 +246,43 @@ bool ObjectMgr::DeleteTableRow(const OHandler& hd, const char* szTableName, size
 }
 
 bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s8 nValue) {
-	return SetTableValue(hd, szTableName, nRow, nCol, nValue);
+	return SetTableValue<s8>(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s8& nValue) {
-	return GetTableValue(hd, szTableName, nRow, nCol, nValue);
+	return GetTableValue<s8>(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s16 nValue) {
-	return SetTableValue(hd, szTableName, nRow, nCol, nValue);
+	return SetTableValue<s16>(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s16& nValue) {
-	return GetTableValue(hd, szTableName, nRow, nCol, nValue);
+	return GetTableValue<s16>(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s32 nValue) {
-	return SetTableValue(hd, szTableName, nRow, nCol, nValue);
+	return SetTableValue<s32>(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s32& nValue) {
-	return GetTableValue(hd, szTableName, nRow, nCol, nValue);
+	return GetTableValue<s32>(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s64 nValue) {
-	return SetTableValue(hd, szTableName, nRow, nCol, nValue);
+	return SetTableValue<s64>(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, s64& nValue) {
-	return GetTableValue(hd, szTableName, nRow, nCol, nValue);
+	return GetTableValue<s64>(hd, szTableName, nRow, nCol, nValue);
 }
 
 bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, double dValue) {
-	return SetTableValue(hd, szTableName, nRow, nCol, dValue);
+	return SetTableValue<double>(hd, szTableName, nRow, nCol, dValue);
 }
 
 bool ObjectMgr::GetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, double& dValue) {
-	return GetTableValue(hd, szTableName, nRow, nCol, dValue);
+	return GetTableValue<double>(hd, szTableName, nRow, nCol, dValue);
 }
 
 bool ObjectMgr::SetTableValue(const OHandler& hd, const char* szTableName, size_t nRow, size_t nCol, const char* szValue, size_t nLen) {

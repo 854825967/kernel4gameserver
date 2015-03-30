@@ -19,7 +19,7 @@ namespace tools {
             return ::GetCurrentThreadId();
 #elif defined  linux
             return pthread_self();
-#endif linux
+#endif //linux
         }
 
         inline const char * GetAppPath() {

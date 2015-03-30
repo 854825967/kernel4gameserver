@@ -13,11 +13,14 @@
 #include "ProtocolID.pb.h"
 using namespace tcore;
 
+static s32 i = 0;
+
 class ClientConnectSink : public IConnectionSink {
 public:
     virtual void OnConnected(tcore::IKernel * pKernel) {
         RGS_MSG_CALL(CLIENT_MSG_CHOOSE_SERVER_REQ, ClientConnectSink::OnClientChooseServerReq);
         RGS_MSG_CALL(CLIENT_MSG_LOGIN_REQ, ClientConnectSink::OnClientLoginReq);
+        ECHO("connected link count %d", ++i);
     }
 
     virtual void OnConnectFailed(tcore::IKernel * pKernel) {
@@ -25,7 +28,8 @@ public:
     }
 
     virtual void OnConnectionBreak(tcore::IKernel * pKernel) {
-
+        ECHO_TRACE("connection break cout %d", --i);
+        delete this;
     }
 
     void OnClientChooseServerReq(tcore::IKernel *, const s32 nMsgID, const void * pContext, const s32 nSize) {
@@ -50,7 +54,6 @@ public:
     
 
 private:
-
 };
 
 #endif	/* __ClientConnectSick_h_ */

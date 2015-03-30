@@ -151,6 +151,7 @@ public:
 	}
 
 	void SetString(const char* szStrValue) {
+		clear_string();
 		this->strValue = NEW string(szStrValue, strlen(szStrValue));
 		this->type = DATA_TYPE_STRING;
 	}
@@ -161,6 +162,7 @@ public:
 	}
 
 	void SetS8(s8 s8Value) {
+		clear_string();
 		this->s8Value = s8Value;
 		this->type = DATA_TYPE_S8;
 	}
@@ -171,6 +173,7 @@ public:
 	}
 
 	void SetS16(s16 s16Value) {
+		clear_string();
 		this->s16Value = s16Value;
 		this->type = DATA_TYPE_S16;
 	}
@@ -181,6 +184,7 @@ public:
 	}
 
 	void SetS32(s32 s32Value) {
+		clear_string();
 		this->s32Value = s32Value;
 		this->type = DATA_TYPE_S32;
 	}
@@ -191,6 +195,7 @@ public:
 	}
 
 	void SetS64(s64 s64Value) {
+		clear_string();
 		this->s64Value = s64Value;
 		this->type = DATA_TYPE_S64;
 	}
@@ -201,6 +206,7 @@ public:
 	}
 
 	void SetDouble(double dValue) {
+		clear_string();
 		this->dValue = dValue;
 		this->type = DATA_TYPE_DOUBLE;
 	}
@@ -212,6 +218,7 @@ public:
 
 	template<typename Type>
 	void SetValue(Type value) {
+		clear_string();
 		switch (type) {
 		case DATA_TYPE_S8:
 			s8Value = value;
@@ -228,6 +235,18 @@ public:
 		case DATA_TYPE_DOUBLE:
 			dValue = value;
 			break;
+		}
+	}
+
+private:
+	CData (const CData& rhs);
+	CData& operator=(const CData& rhs);
+
+private:
+	void clear_string(void) {
+		if (type == DATA_TYPE_STRING && strValue) {
+			delete strValue;
+			strValue = NULL;
 		}
 	}
 };

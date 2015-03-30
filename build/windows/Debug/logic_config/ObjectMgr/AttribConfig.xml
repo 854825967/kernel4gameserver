@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <attribconfig>
-  <config typename="Role"/>
-  <config typename="Monster"/>
+  <config typename="Object" typeid="1"/>
+  <config typename="Creature" typeid="2"/>
+  <config typename="Role" typeid="3"/>
+  <config typename="Monster" typeid="4"/>
+  <config typename="Weapon" typeid="5"/>
 </attribconfig>

@@ -166,7 +166,7 @@ bool Object::Table::SetValue(size_t nRow, size_t nCol, const char* szValue, size
 	}
 	TableRow& row = m_rows[nRow];
 	memset(row.pBlob + nStartPos, 0, MAX_TABLE_DATA_LENGTH);
-	tools::SafeMemcpy(row.pBlob + nStartPos, row.nBlobLen - nStartPos, szValue, nLen);
+	tools::SafeMemcpy(row.pBlob + nStartPos, MAX_TABLE_DATA_LENGTH, szValue, nLen);
 	return true;
 }
 

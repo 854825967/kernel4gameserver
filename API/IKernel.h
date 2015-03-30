@@ -83,10 +83,10 @@ namespace tcore {
             }
         }
 
-        void DoConnect(s32 flags, void * pContext);
+        void DoConnect(void * pEvent, void * pContext);
 
 #ifdef linux
-        void DoIO(s32 flags, void * pContext);
+        void DoIO(void * pEvent, void * pContext);
 #endif //linux
 
         inline void Clear() {
@@ -108,7 +108,7 @@ namespace tcore {
     public:
         virtual ITcpSocket * MallocConnection(IKernel * pKernel) = 0;
 
-        void DoAccept(s32 flags, void * pContext);
+        void DoAccept(void * pEvent, void * pContext);
 
     };
 

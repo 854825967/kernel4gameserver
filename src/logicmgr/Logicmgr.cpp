@@ -21,7 +21,7 @@ Logicmgr::Logicmgr() {
 }
 
 ILogicmgr * Logicmgr::getInstance() {
-    static ILogicmgr * p = NULL;
+    static Logicmgr * p = NULL;
     if (NULL == p) {
         p = NEW Logicmgr;
         if (!p->Redry()) {
@@ -51,7 +51,7 @@ bool Logicmgr::Initialize() {
                 tools::GetAppPath(), pConfig->strModulePath.c_str(), (*itor).c_str());
 
         void * handle = dlopen(path, RTLD_LAZY);
-        TASSERT(handle, "open %s error", path);
+        TASSERT(handle, "open %s error %d", path, errno);
 
         GetModuleFun fun = (GetModuleFun) dlsym(handle, "GetLogicModule");
         TASSERT(fun, "get function:GetLogicModule error");
