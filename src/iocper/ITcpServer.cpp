@@ -4,7 +4,7 @@
 
 namespace tcore {
 
-    void ITcpServer::DoAccept(s32 flags, void * pContext) {
+    void ITcpServer::DoAccept(void * p, void * pContext) {
         struct iocp_event * pEvent = g_poolIocpevent.Create();
         if (NULL == pEvent) {
             shutdown(socket_handler, SD_BOTH);
@@ -42,7 +42,7 @@ namespace tcore {
     }
 
 
-    void ITcpSocket::DoConnect(s32 flags, void * pContext) {
+    void ITcpSocket::DoConnect(void * pEvent, void * pContext) {
 
     }
 
