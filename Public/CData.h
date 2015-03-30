@@ -239,6 +239,10 @@ public:
 	}
 
 private:
+	CData (const CData& rhs);
+	CData& operator=(const CData& rhs);
+
+private:
 	void clear_string(void) {
 		if (type == DATA_TYPE_STRING && strValue) {
 			delete strValue;

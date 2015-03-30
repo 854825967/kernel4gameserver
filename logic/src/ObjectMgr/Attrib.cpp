@@ -148,8 +148,11 @@ bool Attrib::SetValue(const char* szAttrName, const void* pValue, size_t nLen) {
 		MAP_ATTR_INFO::iterator itr = m_pMapAttrInfo->find(szAttrName);
 		if (itr != m_pMapAttrInfo->end()) {
 			const attr_info& info = itr->second;
+			if (info.seripos + nLen > m_nBufLen) {
+				return false;
+			}
 			memset(m_pBuf + info.seripos, 0, info.length);
-			memcpy(m_pBuf + info.seripos, pValue, nLen);
+			tools::SafeMemcpy(m_pBuf + info.seripos, info.length, pValue, nLen);
 			return true;
 		}
 	}
@@ -166,7 +169,10 @@ bool Attrib::GetValue(const char* szAttrName, void* pValue, size_t nLen) {
 		MAP_ATTR_INFO::iterator itr = m_pMapAttrInfo->find(szAttrName);
 		if (itr != m_pMapAttrInfo->end()) {
 			const attr_info& info = itr->second;
-			memcpy(pValue, m_pBuf + info.seripos, info.length);
+			if (info.seripos + nLen > m_nBufLen) {
+				return false;
+			}
+			tools::SafeMemcpy(pValue, nLen, m_pBuf + info.seripos, info.length);
 			return true;
 		}
 	}
