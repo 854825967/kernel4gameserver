@@ -16,7 +16,8 @@ using namespace tcore;
 class ClientConnectSink : public IConnectionSink {
 public:
     virtual void OnConnected(tcore::IKernel * pKernel) {
-        RGS_MSG_CALL(CLIENT_MSG_CHOOSE_SERVER_REQ, ClientConnectSink::OnClientTest);
+        RGS_MSG_CALL(CLIENT_MSG_CHOOSE_SERVER_REQ, ClientConnectSink::OnClientChooseServerReq);
+        RGS_MSG_CALL(CLIENT_MSG_LOGIN_REQ, ClientConnectSink::OnClientLoginReq);
     }
 
     virtual void OnConnectFailed(tcore::IKernel * pKernel) {
@@ -27,7 +28,7 @@ public:
 
     }
 
-    virtual void OnClientTest(tcore::IKernel *, const s32 nMsgID, const void * pContext, const s32 nSize) {
+    void OnClientChooseServerReq(tcore::IKernel *, const s32 nMsgID, const void * pContext, const s32 nSize) {
         DemoClientReq req;
         if ( !req.ParseFromString(string((const char *)pContext)) ) {
             ECHO_ERROR("error msg format, msg id : %d", nMsgID);
@@ -41,6 +42,12 @@ public:
         ask.SerializeToString(&buff);
         SendMSG(SERVER_MSG_CHOOSE_SERVER_ASK, buff.c_str(), buff.size());
     }
+
+    void OnClientLoginReq(tcore::IKernel *, const s32 nMsgID, const void * pContext, const s32 nSize) {
+
+    }
+
+    
 
 private:
 
