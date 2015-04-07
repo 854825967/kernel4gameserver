@@ -79,11 +79,11 @@ namespace tcore {
                 return false;
             } 
         } else {
-            m_sendStream.LockWrite();
+            m_sendStream.LockRead();
             pEvent->wbuf.buf = (char *)m_sendStream.buff();
-            pEvent->wbuf.len = (m_sendStream.size()>=Configmgr::getInstance()->GetCoreConfig()->sNetSendSize)?(Configmgr::getInstance()->GetCoreConfig()->sNetSendSize):(m_sendStream.size());
+            pEvent->wbuf.len = (m_sendStream.size() >= Configmgr::getInstance()->GetCoreConfig()->sNetSendSize)?(Configmgr::getInstance()->GetCoreConfig()->sNetSendSize):(m_sendStream.size());
             s32 res = WSASend(socket_handler, &pEvent->wbuf, 1, NULL, 0, (LPWSAOVERLAPPED)pEvent, NULL);
-            m_sendStream.FreeWrite();
+            m_sendStream.LockRead();
 
             if (SOCKET_ERROR == res && WSA_IO_PENDING == (pEvent->code = WSAGetLastError()) ) {
                 return false;
