@@ -15,6 +15,7 @@ int main() {
 
     pKernel->Loop();
 
+    pKernel->Destory();
     return 0;
 }
 

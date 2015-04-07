@@ -19,12 +19,7 @@ class IConnectionSink : public tcore::ITcpSocket {
 public:
     typedef void (IConnectionSink::*memfun)(tcore::IKernel *, const s32, const void *, const s32);
 
-    virtual s32 Recv(tcore::IKernel * pKernel, const void * context, const s32 size) {
-        
-        ECHO("recv data : %d", size);
-        Close();
-        return size;
-        
+    virtual s32 Recv(tcore::IKernel * pKernel, const void * context, const s32 size) {        
         s32 nSize = 0;
         if (*(const s32 *)context <= size && size > 8) {
             nSize= *(const s32 *)context;

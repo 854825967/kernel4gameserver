@@ -44,10 +44,15 @@ s64 iocpworker::DealEvent(s64 overtime) {
                             client->Disconnect(Kernel::getInstance());
                         }
                     } else {
-                        s32 nUse = 0;
-                        while (0 != client->m_recvStream.size() &&
-                            0 != (nUse = client->Recv(Kernel::getInstance(), client->m_recvStream.buff(), client->m_recvStream.size())) ) {
+                        while (0 != client->m_recvStream.size()) {
+                            client->m_recvStream.LockRead();
+                            s32 nUse = client->Recv(Kernel::getInstance(), client->m_recvStream.buff(), client->m_recvStream.size());
+                            client->m_recvStream.FreeRead();
+                            if (nUse > 0) {
                                 client->m_recvStream.out(nUse);
+                            } else {
+                                break;
+                            }
                         }
                     }
                     g_poolIocpevent.Recover(pEvent);
@@ -92,11 +97,9 @@ void iocpworker::SendDisconnectEvent(struct iocp_event * & pEvent) {
         ECHO("double close %d", pEvent->socket);
         g_poolIocpevent.Recover(pEvent);
     }
-
 }
 
 void iocpworker::Run() {
-    ECHO("iocpworker run thread %ld", tools::GetCurrentThreadID());
     while (true) {
         if (THREAD_STOPPING == m_nStatus) {
             m_nStatus = THREAD_STOPED;

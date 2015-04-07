@@ -207,7 +207,6 @@ void iocper::CompletedAccept() {
         }
     }
 
-    ECHO("accept thread %ld", tools::GetCurrentThreadID());
     ITcpServer * server = (ITcpServer *)pEvent->pContext;
     TASSERT(server, "wtf");
     // accept
