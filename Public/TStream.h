@@ -89,6 +89,7 @@ namespace tlib {
                     malloc_new_size(nNewSize);
                 } else {
                     STREAM_OPT_LOCK(b, m_pRlock);
+                    cursize = m_write - m_read;
                     tools::SafeMemcpy(m_pbuff, m_max,&m_pbuff[m_read], cursize);
                     m_write = cursize;
                     m_read = 0;
