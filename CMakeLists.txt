@@ -25,149 +25,43 @@ IF(WIN32)
     ENDIF(CMAKE_CL_64)
 ENDIF(WIN32)
 
-INCLUDE_DIRECTORIES(
-    "${PROJECT_SOURCE_DIR}/Public"
-    "${PROJECT_SOURCE_DIR}/API"
-    "${PROJECT_SOURCE_DIR}/src/"
-    "${PROJECT_SOURCE_DIR}/src/interface"
-    "${PROJECT_SOURCE_DIR}/src/epoller"
-    "${PROJECT_SOURCE_DIR}/src/iocper"
-    )
-
 SET(TINYXML
-    "${PROJECT_SOURCE_DIR}/Public/tinyxml/tinystr.cpp"
-    "${PROJECT_SOURCE_DIR}/Public/tinyxml/tinystr.h"
-    "${PROJECT_SOURCE_DIR}/Public/tinyxml/tinyxml.cpp"
-    "${PROJECT_SOURCE_DIR}/Public/tinyxml/tinyxml.h"
-    "${PROJECT_SOURCE_DIR}/Public/tinyxml/tinyxmlerror.cpp"
-    "${PROJECT_SOURCE_DIR}/Public/tinyxml/tinyxmlparser.cpp"
+    "${PROJECT_SOURCE_DIR}/src/Public/tinyxml/tinystr.cpp"
+    "${PROJECT_SOURCE_DIR}/src/Public/tinyxml/tinystr.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/tinyxml/tinyxml.cpp"
+    "${PROJECT_SOURCE_DIR}/src/Public/tinyxml/tinyxml.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/tinyxml/tinyxmlerror.cpp"
+    "${PROJECT_SOURCE_DIR}/src/Public/tinyxml/tinyxmlparser.cpp"
     )
 
 SET(PUBLIC
-    "${PROJECT_SOURCE_DIR}/Public/CArgs.h"
-    "${PROJECT_SOURCE_DIR}/Public/CData.h"
-    "${PROJECT_SOURCE_DIR}/Public/CLock.h"
-    "${PROJECT_SOURCE_DIR}/Public/CLockUnit.h"
-    "${PROJECT_SOURCE_DIR}/Public/CRand.h"
-    "${PROJECT_SOURCE_DIR}/Public/CThread.h"
-    "${PROJECT_SOURCE_DIR}/Public/CThread.cpp"
-    "${PROJECT_SOURCE_DIR}/Public/CHashMap.h"
-    "${PROJECT_SOURCE_DIR}/Public/Linux.h"
-    "${PROJECT_SOURCE_DIR}/Public/Winsys.h"
-    "${PROJECT_SOURCE_DIR}/Public/MultiSys.h"
-    "${PROJECT_SOURCE_DIR}/Public/MultiSys.cpp"
-    "${PROJECT_SOURCE_DIR}/Public/Tools.h"
-    "${PROJECT_SOURCE_DIR}/Public/TPool.h"
-    "${PROJECT_SOURCE_DIR}/Public/TBundler.h"
-    "${PROJECT_SOURCE_DIR}/Public/TCallBack.h"
-    "${PROJECT_SOURCE_DIR}/Public/TQueue.h"
-    "${PROJECT_SOURCE_DIR}/Public/TStream.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/CArgs.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/CDumper.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/CDumper.cpp"
+    "${PROJECT_SOURCE_DIR}/src/Public/CData.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/CLock.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/CLockUnit.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/CRand.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/CThread.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/CThread.cpp"
+    "${PROJECT_SOURCE_DIR}/src/Public/CHashMap.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/Linux.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/Winsys.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/MultiSys.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/MultiSys.cpp"
+    "${PROJECT_SOURCE_DIR}/src/Public/Tools.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/TPool.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/TBundler.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/TCallBack.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/TQueue.h"
+    "${PROJECT_SOURCE_DIR}/src/Public/TStream.h"
     )
 
 SET(API
-    "${PROJECT_SOURCE_DIR}/API/IKernel.h"
-    "${PROJECT_SOURCE_DIR}/API/IModule.h"
+    "${PROJECT_SOURCE_DIR}/src/API/IKernel.h"
+    "${PROJECT_SOURCE_DIR}/src/API/IModule.h"
     )
-
-SET(KERNEL_INTERFACE
-    "${PROJECT_SOURCE_DIR}/src/interface/ICore.h"
-    "${PROJECT_SOURCE_DIR}/src/interface/IConfigmgr.h"
-    "${PROJECT_SOURCE_DIR}/src/interface/ILogicmgr.h"
-    "${PROJECT_SOURCE_DIR}/src/interface/INetengine.h"
-    "${PROJECT_SOURCE_DIR}/src/interface/ITimermgr.h"
-    )
-
-SET(KERNEL_CONFIG_MGR
-    "${PROJECT_SOURCE_DIR}/src/configmgr/Configmgr.h"
-    "${PROJECT_SOURCE_DIR}/src/configmgr/Configmgr.cpp"
-    )
-
-SET(KERNEL_EPOLLER
-    "${PROJECT_SOURCE_DIR}/src/epoller/epoller_header.h"
-    "${PROJECT_SOURCE_DIR}/src/epoller/epoller_worker.h"
-    "${PROJECT_SOURCE_DIR}/src/epoller/epoller_worker.cpp"
-    "${PROJECT_SOURCE_DIR}/src/epoller/epoller.h"
-    "${PROJECT_SOURCE_DIR}/src/epoller/epoller.cpp"
-    "${PROJECT_SOURCE_DIR}/src/epoller/ITcpServer.cpp"
-    )
-
-SET(KERNEL_IOCPER
-    "${PROJECT_SOURCE_DIR}/src/iocper/iocper.h"
-    "${PROJECT_SOURCE_DIR}/src/iocper/iocper.cpp"
-    "${PROJECT_SOURCE_DIR}/src/iocper/iocpworker.h"
-    "${PROJECT_SOURCE_DIR}/src/iocper/iocpworker.cpp"
-    "${PROJECT_SOURCE_DIR}/src/iocper/iocphead.h"
-    "${PROJECT_SOURCE_DIR}/src/iocper/iocphead.cpp"
-    "${PROJECT_SOURCE_DIR}/src/iocper/ITcpServer.cpp"
-    )
-
-
-SET(KERNEL_LOGIC_MGR
-    "${PROJECT_SOURCE_DIR}/src/logicmgr/Logicmgr.h"
-    "${PROJECT_SOURCE_DIR}/src/logicmgr/Logicmgr.cpp"
-    )
-
-SET(KERNEL_TIMER_MGR
-    "${PROJECT_SOURCE_DIR}/src/timermgr/TimerHandler.h"
-    "${PROJECT_SOURCE_DIR}/src/timermgr/Timermgr.h"
-    "${PROJECT_SOURCE_DIR}/src/timermgr/Timermgr.cpp"
-    )
-
-SET(KERNEL
-        "${PROJECT_SOURCE_DIR}/src/Kernel.h"
-        "${PROJECT_SOURCE_DIR}/src/Kernel.cpp"
-        "${PROJECT_SOURCE_DIR}/src/main.cpp"
-   )
-   
-SOURCE_GROUP(API FILES ${API})
-SOURCE_GROUP(Public\\tinyxml FILES ${TINYXML})
-SOURCE_GROUP(Public FILES ${PUBLIC})
-
-SOURCE_GROUP(src\\interface FILES ${KERNEL_INTERFACE})
-SOURCE_GROUP(src\\configmgr FILES ${KERNEL_CONFIG_MGR})
-SOURCE_GROUP(src\\logicmgr FILES ${KERNEL_LOGIC_MGR})
-SOURCE_GROUP(src\\timermgr FILES ${KERNEL_TIMER_MGR})
-SOURCE_GROUP(src\\iocper FILES ${KERNEL_IOCPER})
-SOURCE_GROUP(src\\epoller FILES ${KERNEL_EPOLLER})
-SOURCE_GROUP(src FILES ${KERNEL})
-
-IF(UNIX)
-ADD_EXECUTABLE(Kernel
-        ${API}
-        ${TINYXML}
-        ${PUBLIC}
-        ${KERNEL_INTERFACE}
-        ${KERNEL_CONFIG_MGR}
-        ${KERNEL_LOGIC_MGR}
-        ${KERNEL_TIMER_MGR}
-        ${KERNEL_EPOLLER}
-        ${KERNEL}
-        )
-ENDIF(UNIX)
-
-IF(WIN32)
-ADD_EXECUTABLE(Kernel
-        ${API}
-        ${TINYXML}
-        ${PUBLIC}
-        ${KERNEL_INTERFACE}
-        ${KERNEL_CONFIG_MGR}
-        ${KERNEL_LOGIC_MGR}
-        ${KERNEL_TIMER_MGR}
-        ${KERNEL_IOCPER}
-        ${KERNEL}
-        )
-ENDIF(WIN32)
-IF(UNIX)
-SET(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build/linux")
-ENDIF(UNIX)
-
-IF(WIN32)
-SET(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build/windows")
-ENDIF(WIN32)
-
-TARGET_LINK_LIBRARIES(Kernel ${STATIC_LIBRARYS})
-
-
-ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/logic/src/)
+    
+ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/kernel/)
+ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/logic/)
 
