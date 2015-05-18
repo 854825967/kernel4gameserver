@@ -26,6 +26,8 @@ namespace tlib {
 
         inline unsigned long long GetThread() {return m_hThread;};
 
+    protected:
+        s8 m_nStatus;
     private:
         unsigned long long m_hThread;
     };

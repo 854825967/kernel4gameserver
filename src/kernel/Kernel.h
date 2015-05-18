@@ -18,6 +18,11 @@ public:
     virtual bool StartTcpServer(tcore::ITcpServer * sever, const char * ip, const s32 port);
     virtual bool StartTcpClient(tcore::ITcpSession * client, const char * ip, const s32 port);
 
+    //log interface
+    virtual void LogDebug(const char * debug);
+    virtual void LogTrace(const char * debug);
+    virtual void LogError(const char * debug);
+
     // tiemr interface 
     virtual bool StartTimer(s32 id, tcore::ITimer * timer, s64 interval, s64 delay, s64 loop) ;
     virtual bool KillTimer(s32 id, tcore::ITimer * timer);

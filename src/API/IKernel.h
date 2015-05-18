@@ -72,6 +72,11 @@ namespace tcore {
         virtual bool StartTcpServer(ITcpServer * server, const char * ip, const s32 port) = 0;
         virtual bool StartTcpClient(ITcpSession * client, const char * ip, const s32 port) = 0;
 
+        // log interfac
+        virtual void LogDebug(const char * debug) = 0;
+        virtual void LogTrace(const char * debug) = 0;
+        virtual void LogError(const char * debug) = 0;
+
         // tiemr interface 
         virtual bool StartTimer(s32 id, tcore::ITimer * timer, s64 interval, s64 delay = 0, s64 loop = -1) = 0; //-1 is forever
         virtual bool KillTimer(s32 id, ITimer * timer) = 0;

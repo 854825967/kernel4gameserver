@@ -46,7 +46,6 @@ private:
     bool CheckSocketClient(const s64 socket, CPipe * pCPipe);
 
 private:
-    s8 m_nStatus;
     HANDLE m_hCompletionPort;
     SOCKET_CLIENT_RELATION m_mapSocketClient;
     IOEVENT_QUEUE m_oEventQueue;

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <core xmlns="http://www.netbeans.org/ns/project/1">
     <loop tick="33" />
+    <log maxtime="3600" maxfile="1024" />
     <netthread count="2" frametick="10" send_size="102400" recv_size="1024"/>
     <httpthread count="1" frametick="5" />
     <timer tick="11" />

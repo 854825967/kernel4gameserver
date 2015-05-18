@@ -2,7 +2,6 @@
 #define __iocper_h__
 
 #include "iocphead.h"
-#include "CThread.h"
 class iocpworker;
 
 class iocper : public INetengine {

@@ -30,7 +30,7 @@ public:
     }
 
     virtual void OnDisconnect(IKernel * pKernel) {
-        ECHO("OnDisconnect %d", --s_count);
+        pKernel->LogDebug("OnDisconnect");
         TASSERT(tools::GetCurrentThreadID() == s_id, "wtf");
 
         MAP_CONNECTSINK::iterator itor = s_map.find(this);
@@ -49,7 +49,7 @@ public:
 
         m_bConnected = true;
 
-        ECHO("OnConnected %d", ++s_count);
+        pKernel->LogDebug("OnConnected");
         char buff[1024 * 100] = {0};
         memset(buff, 'h', sizeof(buff));
         Send(buff, sizeof(buff));
