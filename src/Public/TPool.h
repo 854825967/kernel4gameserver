@@ -104,7 +104,7 @@ namespace tlib {
             }
         }
     private:
-        void AllocNewBlob(s32 count) {
+        void AllocNewBlob(s32 _count) {
             if (m_pUnitAry == NULL) {
                 TASSERT(m_sBlockCount == 0, "pool bug");
                 m_pUnitAry = NEW type_info*;
@@ -120,8 +120,8 @@ namespace tlib {
                 m_pUnitAry = p;
             }
 
-            m_pUnitAry[m_sBlockCount] = NEW type_info[count];
-            for (s32 i = 0; i < count; i++) {
+            m_pUnitAry[m_sBlockCount] = NEW type_info[_count];
+            for (s32 i = 0; i < _count; i++) {
                 m_list.push_back(m_pUnitAry[m_sBlockCount] + i);
             }
             m_sBlockCount++;

@@ -66,7 +66,7 @@ namespace tcore {
     class IKernel {
     public:
 		//find logic module
-		virtual IModule * FindModule(const char * name) = 0;
+        virtual IModule * FindModule(const char * name) = 0;
 
         // net interface
         virtual bool StartTcpServer(ITcpServer * server, const char * ip, const s32 port) = 0;

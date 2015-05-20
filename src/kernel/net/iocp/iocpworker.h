@@ -6,23 +6,6 @@
 #include "CThread.h"
 #include "CHashMap.h"
 
-class CPipe;
-
-enum {
-    IO_EVENT_TYPE_BREAK = 0,
-    IO_EVENT_TYPE_RECV = 1,
-    IO_EVENT_TYPE_CONNECTED = 2,
-    IO_EVENT_TYPE_CONNECTFAILD = 3,
-
-    //ADD BEFOR THIS
-    IO_EVENT_TYPE_COUNT
-};
-
-struct ioevent {
-    s8 type;
-    CPipe * pCPipe;
-};
-
 class iocpworker : public CThread {
     typedef CHashMap<s64, CPipe *> SOCKET_CLIENT_RELATION;
     typedef TQueue<ioevent *, false, 4096> IOEVENT_QUEUE;

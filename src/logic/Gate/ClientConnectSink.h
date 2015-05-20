@@ -26,6 +26,8 @@ public:
 
     // return size that u use;
     virtual s32 OnRecv(IKernel * pKernel, const void * context, const s32 size) {
+        ECHO("%s", (const char *)context);
+        Send("hello world\n", 13);
         return size;
     }
 
@@ -50,10 +52,9 @@ public:
         m_bConnected = true;
 
         pKernel->LogDebug("OnConnected");
-        char buff[1024 * 100] = {0};
-        memset(buff, 'h', sizeof(buff));
-        Send(buff, sizeof(buff));
-        Close();
+//        char buff[1024 * 100] = {0};
+//        memset(buff, 'h', sizeof(buff));
+//        Send(buff, sizeof(buff));
 
         s_map.insert(make_pair(this, this));
     }

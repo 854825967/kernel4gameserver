@@ -1,8 +1,8 @@
 #ifndef __INetengine_h__
 #define __INetengine_h__
 
-#include "ICore.h"
 #include "IKernel.h"
+#include "ICore.h"
 
 class INetengine : public ICore {
 public:

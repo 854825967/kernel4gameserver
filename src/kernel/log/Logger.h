@@ -14,7 +14,7 @@ struct FileInfo {
 
     bool FILEOpen(const char * name) {
         if (file != NULL) {
-            TASSERT(false, "create file error %d", ::GetLastError());
+            TASSERT(false, "create file error %d", tools::GetLastErrno());
             return false;
         }
 
@@ -38,7 +38,7 @@ struct FileInfo {
             m_lFileSize = 0;
             return true;
         } else {
-            TASSERT(false, "close file error %d", ::GetLastError());
+            TASSERT(false, "close file error %d", tools::GetLastErrno());
         }
 
         return false;
@@ -48,7 +48,7 @@ struct FileInfo {
         s32 nCount = fwrite(context, 1, size, file);
         m_lFileSize += nCount;
         if (nCount != size) {
-            TASSERT(false, "write file error %d", ::GetLastError());
+            TASSERT(false, "write file error %d", tools::GetLastErrno());
             return false;
         }
         fflush(file);

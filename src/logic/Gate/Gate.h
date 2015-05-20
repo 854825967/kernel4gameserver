@@ -27,18 +27,12 @@ public:
 
 };
 
-class Gate : public IGate, ITcpServer, ITimer {
+class Gate : public IGate, ITcpServer {
 public:
     virtual bool Initialize(IKernel * pKernel);
     virtual bool Launched(IKernel * pKernel);
     virtual bool Destroy(IKernel * pKernel);        
     
-
-    //will be called before first OnTimer, will not affect OnTimer count
-    virtual void OnStart(IKernel * pKernel, const s32 sTimerID, s64 lTimetick); 
-    virtual void OnTime(IKernel * pKernel, const s32 sTimerID, s64 lTimetick);
-    virtual void OnTerminate(IKernel * pKernel, const s32 sTimerID, bool nonviolent, s64 lTimetick);
-
     virtual ITcpSession * MallocConnection(IKernel * pKernel);
     virtual void Error(IKernel * pKernel, ITcpSession * pSession);
 };

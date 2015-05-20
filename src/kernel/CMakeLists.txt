@@ -26,12 +26,16 @@ SET(KERNEL_CONFIG_MGR
     )
 
 SET(KERNEL_EPOLLER
-    "${PROJECT_SOURCE_DIR}/src/kernel/epoller/epoller_header.h"
-    "${PROJECT_SOURCE_DIR}/src/kernel/epoller/epoller_worker.h"
-    "${PROJECT_SOURCE_DIR}/src/kernel/epoller/epoller_worker.cpp"
-    "${PROJECT_SOURCE_DIR}/src/kernel/epoller/epoller.h"
-    "${PROJECT_SOURCE_DIR}/src/kernel/epoller/epoller.cpp"
-    "${PROJECT_SOURCE_DIR}/src/kernel/epoller/ITcpServer.cpp"
+    "${PROJECT_SOURCE_DIR}/src/kernel/net/epoll/Pipe.h"
+    "${PROJECT_SOURCE_DIR}/src/kernel/net/epoll/CPipe.h"
+    "${PROJECT_SOURCE_DIR}/src/kernel/net/epoll/CPipe.cpp"
+    "${PROJECT_SOURCE_DIR}/src/kernel/net/epoll/SPipe.h"
+    "${PROJECT_SOURCE_DIR}/src/kernel/net/epoll/SPipe.cpp"
+    "${PROJECT_SOURCE_DIR}/src/kernel/net/epoll/epollheader.h"
+    "${PROJECT_SOURCE_DIR}/src/kernel/net/epoll/epoller.h"
+    "${PROJECT_SOURCE_DIR}/src/kernel/net/epoll/epoller.cpp"
+    "${PROJECT_SOURCE_DIR}/src/kernel/net/epoll/epollWorker.h"
+    "${PROJECT_SOURCE_DIR}/src/kernel/net/epoll/epollWorker.cpp"
     )
 
 SET(KERNEL_IOCPER
@@ -50,7 +54,6 @@ SET(KERNEL_IOCPER
     "${PROJECT_SOURCE_DIR}/src/kernel/net/iocp/SPipe.cpp"
     )
 
-
 SET(KERNEL_LOGIC_MGR
     "${PROJECT_SOURCE_DIR}/src/kernel/logicmgr/Logicmgr.h"
     "${PROJECT_SOURCE_DIR}/src/kernel/logicmgr/Logicmgr.cpp"
@@ -60,6 +63,11 @@ SET(KERNEL_TIMER_MGR
     "${PROJECT_SOURCE_DIR}/src/kernel/timermgr/TimerHandler.h"
     "${PROJECT_SOURCE_DIR}/src/kernel/timermgr/Timermgr.h"
     "${PROJECT_SOURCE_DIR}/src/kernel/timermgr/Timermgr.cpp"
+    )
+
+SET(KERNEL_LOGGER
+    "${PROJECT_SOURCE_DIR}/src/kernel/log/Logger.h"
+    "${PROJECT_SOURCE_DIR}/src/kernel/log/Logger.cpp"
     )
 
 SET(KERNEL
@@ -90,6 +98,7 @@ ADD_EXECUTABLE(Kernel
         ${KERNEL_LOGIC_MGR}
         ${KERNEL_TIMER_MGR}
         ${KERNEL_EPOLLER}
+        ${KERNEL_LOGGER}
         ${KERNEL}
         )
 ENDIF(UNIX)

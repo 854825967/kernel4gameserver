@@ -2,7 +2,7 @@
 #include "Tools.h"
 #include "CDumper.h"
 
-
+#ifdef _WIN32
 class Dumper {
 public:
     Dumper() {
@@ -11,12 +11,13 @@ public:
 };
 
 Dumper dumper;
+#endif // _WIN32
 
 int main() {    
     //_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #ifdef WIN32
     WSADATA wsaData;
-    WSAStartup(MAKEWORD(2,2), &wsaData);// ³õÊ¼»¯Windows Socket 2.2
+    WSAStartup(MAKEWORD(2,2), &wsaData);// ï¿½ï¿½Ê¼ï¿½ï¿½Windows Socket 2.2
 #endif //WIN32
     Kernel * pKernel = (Kernel *) Kernel::getInstance();
     TASSERT(pKernel, "get kernel point error");

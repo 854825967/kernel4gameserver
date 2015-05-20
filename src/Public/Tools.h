@@ -15,7 +15,12 @@ namespace tools {
             time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond);
         return strtime;
 #elif defined linux
-
+        struct tm * ptm = NULL;
+        time_t t = time(NULL);
+        ptm = localtime(&t);
+        char strtime[64] = {0};
+        strftime(strtime, sizeof(strtime), format, ptm);
+        return strtime;
 #endif //linux
     }
 
@@ -40,6 +45,15 @@ namespace tools {
 #endif //linux
         }
 
+        inline s32 GetLastErrno() {
+#ifdef _WIN32
+            return ::GetLastError();
+#elif defined  linux
+            return errno;
+#endif //linux
+
+        }
+        
         inline const char * GetAppPath() {
             static char * pStrPath = NULL;
 

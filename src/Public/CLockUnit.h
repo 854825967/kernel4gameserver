@@ -50,7 +50,12 @@ namespace tlib {
         ~CLockUnit() {
             pthread_mutex_destroy(&m_lock);
         }
-
+        
+        void Clear() {
+            ::pthread_mutex_destroy(&m_lock);
+            ::pthread_mutex_init(&m_lock, NULL);
+        }
+        
         void Lock() {
             pthread_mutex_lock(&m_lock);
         }

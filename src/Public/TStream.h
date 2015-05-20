@@ -76,9 +76,7 @@ namespace tlib {
         }
 
         inline s32 size() const {
-            s32 nSize = 0;
-            nSize = m_write - m_read;
-            return nSize;
+            return m_write - m_read;
         }
 
         void in(const void * pbuff, s32 size) {
