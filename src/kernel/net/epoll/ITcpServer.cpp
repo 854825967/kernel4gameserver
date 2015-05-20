@@ -1,6 +1,6 @@
 #include "IKernel.h"
 #include "epoller.h"
-#include "epoller_worker.h"
+#include "epollWorker.h"
 #include "Kernel.h"
 #include "configmgr/Configmgr.h"
 #include <arpa/inet.h>
@@ -8,7 +8,7 @@ namespace tcore {
     static s32 s_index = 0;
     void ITcpSocket::DoIO(void * p, void* pContext) {
         epoller_event * pEvent = (epoller_event *)p;
-        epoller_worker * pWoker = (epoller_worker *) pContext;
+        epollWorker * pWoker = (epollWorker *) pContext;
         TASSERT(m_nStatus != SS_UNINITIALIZE, "wtf");
         if ((pEvent->flags & EPOLLIN) && SS_ESTABLISHED == m_nStatus) {
             //read
@@ -95,7 +95,7 @@ namespace tcore {
             shut_socket(socket_handler);
         } else {
             //sth. must be deal
-            epoller_worker * pWorker = pEpoller->BalancingWorker();
+            epollWorker * pWorker = pEpoller->BalancingWorker();
             if (pWorker->RelateSocketClient(this->socket_handler, this)) {
                 m_nStatus = SS_ESTABLISHED;
                 Connected(Kernel::getInstance());
@@ -108,40 +108,6 @@ namespace tcore {
     }
 
     void ITcpServer::DoAccept(void * p, void * pContext) {
-        epoller * pEpoller = (epoller *) pContext;
-        epoller_event * pEvent = (epoller_event *)p;
-        if (pEvent->flags == EPOLLIN) {
-            struct sockaddr_in addr;
-            socklen_t len = sizeof (addr);
-            s32 handler = -1;
-            while ( (handler = accept(socket_handler, (sockaddr *) & addr, &len) ) >= 0) {
-                if (setnonblocking(handler)) {
-                    ITcpSocket * pSocket = MallocConnection(Kernel::getInstance());
-                    TASSERT(pSocket, "tcpsocket point is null");
-                    memcpy(&pSocket->m_addr, &addr, sizeof (pSocket->m_addr));
-                    SafeSprintf(pSocket->ip, sizeof (pSocket->ip), inet_ntoa(addr.sin_addr));
-                    pSocket->port = ntohs(addr.sin_port);
-                    pSocket->socket_handler = handler;
-                    pSocket->m_nStatus = SS_ESTABLISHED;
-
-                    epoller_worker * pWorker = pEpoller->BalancingWorker();
-                    if (pWorker->RelateSocketClient(pSocket->socket_handler, pSocket)) {
-                        pSocket->Connected(Kernel::getInstance());
-                    } else {
-                        Error(Kernel::getInstance(), SO_ACCEPT, pSocket, "RelateSocketClient error");
-                        TASSERT(false, "wtf");
-                    }
-                } else {
-                    ECHO("setnonblock error %s", strerror(errno));
-                    shut_socket(handler);
-                }
-            }
-        } else {
-            ECHO("bad accept %s", strerror(errno));
-            pEpoller->remove_handler(socket_handler);
-            shut_socket(socket_handler);
-            g_EpollerDataPool.Recover(pEvent);
-            Error(Kernel::getInstance(), SO_ACCEPT, NULL, "DoAccept error");
-        }
+        
     }
 }

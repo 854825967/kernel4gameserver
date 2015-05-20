@@ -1,10 +1,8 @@
 #ifndef __epoller_h__
 #define __epoller_h__
-#include "IKernel.h"
-#include "epoller_header.h"
 #include "INetengine.h"
-
-class epoller_worker;
+#include "epollheader.h"
+#include "epollWorker.h"
 
 class epoller : public INetengine {
 public:
@@ -14,16 +12,16 @@ public:
     bool Initialize();
     bool Destory();
 
-    bool AddServer(tcore::ITcpServer * server);
-    bool AddClient(tcore::ITcpSocket * client);
-    s64 DonetIO(s64 overtime);
+    bool AddServer(tcore::ITcpServer * server, const char * ip, const s32 port);
+    bool AddClient(tcore::ITcpSession * client, const char * ip, const s32 port);
 
-    epoller_worker * BalancingWorker();
+    epollWorker * BalancingWorker();
     
-    inline void remove_handler(s64 handler) {
-        epoll_ctl(m_epollfd, EPOLL_CTL_DEL, handler, NULL);
-    }
+//    inline void remove_handler(s64 handler) {
+//        epoll_ctl(m_epollfd, EPOLL_CTL_DEL, handler, NULL);
+//    }
     
+    s64 Processing(s64 overtime);
 private:
     epoller();
     ~epoller();
@@ -33,9 +31,11 @@ private:
     void DealConnect();
 
 private:
-    s64 m_epollfd;
-    epoller_worker * m_pWorkerAry;
+    s64 m_lEpollFD;
+    EPOLLEREVENT_PO0L m_oEpeventPool;
+    
     s32 m_nWorkerCount;
+    epollWorker * m_pWorkerAry;
 };
 
 #endif //__epoller_h__
