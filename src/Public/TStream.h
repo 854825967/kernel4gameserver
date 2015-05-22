@@ -25,7 +25,7 @@ namespace tlib {
 
         TStream() {
             m_pbuff = NEW char[buff_length];
-            memset(m_pbuff, 0, buff_length);
+            tools::SafeMemset(m_pbuff, buff_length, 0, buff_length);
             m_read = 0;
             m_write = 0;
             m_max = buff_length;
@@ -54,7 +54,7 @@ namespace tlib {
                 m_pbuff = NEW char[buff_length];
                 m_max = buff_length;
             }
-            memset(m_pbuff, 0, buff_length);
+            tools::SafeMemset(m_pbuff, buff_length, 0, buff_length);
 
             if (b) {
                 m_pRlock->Clear();

@@ -26,9 +26,11 @@ ENDIF(WIN32)
         
 SET(LOGIC_INTERFACE
     "${PROJECT_SOURCE_DIR}/src/logic/Interface/IGate.h"
+    "${PROJECT_SOURCE_DIR}/src/logic/Interface/PublicHeader.h"
     )
     
 SET(LOGIC_DEFINE
     )
-
+    
 ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/logic/Gate)
+ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/logic/Clients)

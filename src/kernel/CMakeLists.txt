@@ -113,6 +113,7 @@ ADD_EXECUTABLE(Kernel
         ${KERNEL_LOGIC_MGR}
         ${KERNEL_TIMER_MGR}
         ${KERNEL_IOCPER}
+        ${KERNEL_LOGGER}
         ${KERNEL}
         )
 ENDIF(WIN32)

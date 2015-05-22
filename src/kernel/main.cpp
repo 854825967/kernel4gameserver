@@ -2,7 +2,7 @@
 #include "Tools.h"
 #include "CDumper.h"
 
-#ifdef _WIN32
+#ifdef WIN32
 class Dumper {
 public:
     Dumper() {

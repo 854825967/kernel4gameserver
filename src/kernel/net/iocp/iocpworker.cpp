@@ -32,17 +32,16 @@ s64 iocpworker::Processing(s64 overtime) {
     s64 lTick = tools::GetTimeMillisecond();
 
    while (true) {
-        ioevent * pEvent = NULL;
-        if (m_oEventQueue.Read(pEvent)) {
-            TASSERT(pEvent, "wtf");
-            CPipe * pCPipe = pEvent->pCPipe;
+        ioevent event;
+        if (m_oEventQueue.Read(event)) {
+            CPipe * pCPipe = event.pCPipe;
             TASSERT(pCPipe, "wtf");
-            switch (pEvent->type) {
+            switch (event.type) {
             case IO_EVENT_TYPE_RECV:
                 {
                     s32 nUse = 0;
                     pCPipe->m_oRecvStream.LockRead();
-                    while ( 0 != pCPipe->m_oRecvStream.size() ) {
+                    if ( 0 != pCPipe->m_oRecvStream.size() ) {
                         nUse = pCPipe->m_pHost->OnRecv(Kernel::getInstance(), pCPipe->m_oRecvStream.buff(), pCPipe->m_oRecvStream.size());
                         if (nUse > 0) {
                             pCPipe->m_oRecvStream.out(nUse);
@@ -78,8 +77,6 @@ s64 iocpworker::Processing(s64 overtime) {
                     break;
                 }
             }
-            m_oEventPool.Recover(pEvent);
-            //delete pEvent;
         } else if (m_oEventQueue.IsEmpty()) {
             return tools::GetTimeMillisecond() - lTick;
         }
@@ -116,12 +113,18 @@ void iocpworker::SendDisconnectEvent(const s64 socket, CPipe * pCPipe) {
     SOCKET_CLIENT_RELATION::iterator itor = m_mapSocketClient.find(socket);
     if (itor != m_mapSocketClient.end()) {
         if (itor->second == pCPipe) {
-            ioevent * pIOEvent = m_oEventPool.Create(); // NEW ioevent; // m_oEventPool.Create();
-            pIOEvent->type = IO_EVENT_TYPE_BREAK;
-            pIOEvent->pCPipe = pCPipe;
+            ioevent event; // m_oEventPool.Create();
+            event.type = IO_EVENT_TYPE_BREAK;
+            event.pCPipe = pCPipe;
             shutdown(pCPipe->m_lSocketHandler, SD_BOTH);
+
+            linger InternalLinger;
+            InternalLinger.l_onoff = 1;
+            InternalLinger.l_linger = 0;
+            setsockopt(pCPipe->m_lSocketHandler, SOL_SOCKET, SO_LINGER, (const char*)&InternalLinger, sizeof(linger));
             closesocket(pCPipe->m_lSocketHandler);
-            m_oEventQueue.Add(pIOEvent);
+            pCPipe->m_lSocketHandler = INVALID_SOCKET;
+            m_oEventQueue.Add(event);
             m_mapSocketClient.erase(itor);
         }
     }
@@ -155,7 +158,7 @@ void iocpworker::Run() {
             continue;
         }
 
-        pEvent->code = GetLastError();
+        pEvent->code = WSAGetLastError();
         if (!nSucceed ) {
             if (WAIT_TIMEOUT == pEvent->code) {
                 CSLEEP(1);
@@ -167,10 +170,10 @@ void iocpworker::Run() {
         switch (pEvent->opt) {
         case SO_CONNECT:
             {
-                ioevent * pIOEvent = m_oEventPool.Create(); // NEW ioevent;
-                pIOEvent->pCPipe = pCPipe;
-                (0 == pEvent->code)?(pIOEvent->type = IO_EVENT_TYPE_CONNECTED):(pIOEvent->type = IO_EVENT_TYPE_CONNECTFAILD);
-                m_oEventQueue.Add(pIOEvent);
+                ioevent event;// m_oEventPool.Create();
+                event.pCPipe = pCPipe;
+                (0 == pEvent->code)?(event.type = IO_EVENT_TYPE_CONNECTED):(event.type = IO_EVENT_TYPE_CONNECTFAILD);
+                m_oEventQueue.Add(event);
                 break;
             }
         case SO_ACCEPT:
@@ -200,10 +203,10 @@ void iocpworker::Run() {
                         if (!pCPipe->DoRecv()) {
                             SendDisconnectEvent(socket_handler, pCPipe);
                         } else {
-                            ioevent * pIOEvent = m_oEventPool.Create(); // NEW ioevent; //m_oEventPool.Create();
-                            pIOEvent->type = IO_EVENT_TYPE_RECV;
-                            pIOEvent->pCPipe = pCPipe;
-                            m_oEventQueue.Add(pIOEvent);
+                            ioevent event; //m_oEventPool.Create(); // NEW ioevent; //m_oEventPool.Create();
+                            event.type = IO_EVENT_TYPE_RECV;
+                            event.pCPipe = pCPipe;
+                            m_oEventQueue.Add(event);
                         }
                     } else if (nIOBytes <= 0 || ERROR_SUCCESS != pEvent->code) {
                         SendDisconnectEvent(socket_handler, pCPipe);

@@ -13,6 +13,7 @@ SET(GATE
     "${PROJECT_SOURCE_DIR}/src/logic/Gate/Gate.h"
     "${PROJECT_SOURCE_DIR}/src/logic/Gate/Gate.cpp"
     "${PROJECT_SOURCE_DIR}/src/logic/Gate/ClientConnectSink.h"
+    "${PROJECT_SOURCE_DIR}/src/logic/Gate/ClientConnectSink.cpp"
     "${PROJECT_SOURCE_DIR}/src/logic/Gate/main.cpp"
     )
     

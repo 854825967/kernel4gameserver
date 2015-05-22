@@ -8,7 +8,7 @@
 
 class iocpworker : public CThread {
     typedef CHashMap<s64, CPipe *> SOCKET_CLIENT_RELATION;
-    typedef TQueue<ioevent *, false, 4096> IOEVENT_QUEUE;
+    typedef TQueue<ioevent, false, 40960> IOEVENT_QUEUE;
     typedef TPool<ioevent, true> IOEVENT_POOL;
 public:
     iocpworker();
@@ -32,7 +32,6 @@ private:
     HANDLE m_hCompletionPort;
     SOCKET_CLIENT_RELATION m_mapSocketClient;
     IOEVENT_QUEUE m_oEventQueue;
-    IOEVENT_POOL m_oEventPool;
 };
 
 #endif //__iocpworker_h__

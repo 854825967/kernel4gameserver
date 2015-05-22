@@ -53,6 +53,8 @@ namespace tcore {
 
     class ITimer {
     public:
+        virtual ~ITimer() {}
+
         //will be called before first OnTimer, will not affect OnTimer count
         virtual void OnStart(IKernel * pKernel, const s32 sTimerID, s64 lTimetick) = 0; 
 

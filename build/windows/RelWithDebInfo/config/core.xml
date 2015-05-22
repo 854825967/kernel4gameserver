@@ -2,7 +2,7 @@
 <core xmlns="http://www.netbeans.org/ns/project/1">
     <loop tick="33" />
     <log maxtime="3600" maxfile="1024" />
-    <netthread count="2" frametick="33" send_size="4096" recv_size="4096"/>
+    <netthread count="4" frametick="33" send_size="4096" recv_size="4096"/>
     <httpthread count="1" frametick="5" />
     <timer tick="11" />
 </core>

@@ -5,6 +5,10 @@
 
 class CRand {
 public:
+    virtual ~CRand() {
+
+    }
+
     void SetSeed(u32 seed) {
         m_lSeed = seed;
     }

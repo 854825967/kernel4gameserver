@@ -12,10 +12,7 @@ bool Gate::Initialize(IKernel * pKernel) {
 }
 
 bool Gate::Launched(IKernel * pKernel) {
-    pKernel->StartTcpServer(this, "0.0.0.0", 16666);
-
-    pKernel->StartTcpServer(NEW ShutDownServer, "0.0.0.0", 12590);
-
+    pKernel->StartTcpServer(this, "0.0.0.0", 12580);
     return true;
 }
 
@@ -24,9 +21,9 @@ bool Gate::Destroy(IKernel * pKernel) {
 }
 
 void Gate::Error(IKernel * pKernel, ITcpSession * pSession) {
-
+    ECHO("%lx", pSession);
 }
 
 ITcpSession * Gate::MallocConnection(IKernel * pKernel) {
-    return NEW ClientConnectSink;
+    return ClientConnectSink::Create();
 }

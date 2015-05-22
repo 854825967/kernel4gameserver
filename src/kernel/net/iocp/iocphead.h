@@ -46,7 +46,7 @@ struct iocp_event {
     void * pContext; /** 上下文指针 */
 };
 
-extern tlib::TPool<CPipe, true> g_oCPipePool;
+extern tlib::TPool<CPipe> g_oCPipePool;
 
 
 // async connect and accept api address

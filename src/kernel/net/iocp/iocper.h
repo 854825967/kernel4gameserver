@@ -32,7 +32,7 @@ private:
 
     HANDLE m_hCompletionPortAC; //Accept & Connect
     s32 m_nWorkerCount;
-
+    tlib::TPool<CPipe> m_oCPipePool;
     tlib::CLockUnit m_threadLock;
 };
 

@@ -190,7 +190,7 @@ void iocper::CompletedAccept() {
 
     if ( 0 != ( res = setsockopt(pEvent->socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (const char*) &pSPipe->m_lSocketHandler, sizeof(pSPipe->m_lSocketHandler)) )
         || SOCKET_ERROR == getpeername(pEvent->socket, (struct sockaddr*)&pEvent->remote, &nLen)) {
-            TASSERT(false, "complete accept error %d", ::GetLastError());
+            ECHO("complete accept error %d", ::GetLastError());
             closesocket(pEvent->socket);
             g_oCPipePool.Recover(pCPipe); // delete pCPipe;
     } else {

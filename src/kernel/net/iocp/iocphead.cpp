@@ -1,6 +1,6 @@
 #include "iocphead.h"
 
-tlib::TPool<CPipe, true> g_oCPipePool;
+tlib::TPool<CPipe> g_oCPipePool;
 
 // async connect and accept api address
 LPFN_ACCEPTEX g_pFunAcceptEx = NULL;
