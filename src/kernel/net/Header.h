@@ -38,8 +38,7 @@ struct ioevent {
     CPipe * pCPipe;
 };
 
-typedef tlib::TQueue<ioevent *, false, 4096> IOEVENT_QUEUE;
-typedef tlib::TPool<ioevent, true> IOEVENT_POOL;
+typedef tlib::TQueue<ioevent, false, 4096> IOEVENT_QUEUE;
 #define BUFF_SIZE (16 * 1024)
 
 #endif //__Header_h__

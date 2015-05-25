@@ -8,13 +8,13 @@ using namespace tcore;
 s64 epollWorker::Processing(s64 overtime) {
     s64 lTick = tools::GetTimeMillisecond();
     s64 lUse = 0;
-    ioevent * pEvent = NULL;
-    while (m_oEventQueue.Read(pEvent)) {
-         switch (pEvent->type) {
+    ioevent event;
+    while (m_oEventQueue.Read(event)) {
+         switch (event.type) {
             case IO_EVENT_TYPE_BREAK:
             case IO_EVENT_TYPE_RECV:
             {
-                CPipe * pCPipe = pEvent->pCPipe;
+                CPipe * pCPipe = event.pCPipe;
                 TASSERT(pCPipe, "wtf");
                 
                 s32 nUse = 0;
@@ -24,7 +24,7 @@ s64 epollWorker::Processing(s64 overtime) {
                     s32 nLeft = pCPipe->m_oRecvStream.size();
                     TASSERT(nLeft >= 0, "wtf %d", nLeft);
                     if (nLeft > 0) {
-                        nUse = pCPipe->m_pHost->OnRecv(Kernel::getInstance(), 
+                        nUse = pCPipe->GetHost()->OnRecv(Kernel::getInstance(), 
                                     (void *)pCPipe->m_oRecvStream.buff(), nLeft);
 
                         if (nUse > 0) {
@@ -35,8 +35,8 @@ s64 epollWorker::Processing(s64 overtime) {
                     pCPipe->m_oRecvStream.FreeRead();
                 } while (0 != nUse);
 
-                if (IO_EVENT_TYPE_BREAK == pEvent->type) {
-                    pCPipe->m_pHost->OnDisconnect(Kernel::getInstance());
+                if (IO_EVENT_TYPE_BREAK == event.type) {
+                    pCPipe->GetHost()->OnDisconnect(Kernel::getInstance());
                 }
                 
                 break;
@@ -45,8 +45,6 @@ s64 epollWorker::Processing(s64 overtime) {
                 TASSERT(false, "wtf");
                 break;
         }
-        
-        m_oEventPool.Recover(pEvent);
          
         lUse = tools::GetTimeMillisecond();
         if (lUse - lTick >= overtime) {
@@ -94,30 +92,26 @@ void epollWorker::Run() {
             CPipe * pCPipe = (CPipe *)p->pData;
             
             s32 eventType = IO_EVENT_TYPE_COUNT;
-            if (events[i].events & EPOLLIN && SS_ESTABLISHED == pCPipe->m_nStatus) {
+            if (events[i].events & EPOLLIN && SS_ESTABLISHED == pCPipe->GetStatus()) {
                 eventType = pCPipe->DoRecv();
-                if (eventType != IO_EVENT_TYPE_COUNT) {
-                    ioevent * pEvent = m_oEventPool.Create();
-                    pEvent->type = eventType;
-                    pEvent->pCPipe = pCPipe;
-                    m_oEventQueue.Add(pEvent);
+            }
+            
+            if (events[i].events & EPOLLOUT && pCPipe->GetStatus() != SS_UNINITIALIZE) {
+                s8 type = pCPipe->DoSend();
+                if (eventType != IO_EVENT_TYPE_BREAK && type != IO_EVENT_TYPE_COUNT) {
+                    eventType = type;
                 }
             }
             
-            if (events[i].events & EPOLLOUT && pCPipe->m_nStatus != SS_UNINITIALIZE) {
-                eventType = pCPipe->DoSend();
-            }
-            
-            if (events[i].events & (EPOLLERR | EPOLLHUP | EPOLLRDHUP) && m_nStatus != SS_UNINITIALIZE) {
+            if (events[i].events & (EPOLLERR | EPOLLHUP | EPOLLRDHUP) && pCPipe->GetStatus() != SS_UNINITIALIZE) {
                 pCPipe->DoClose();
-                eventType = IO_EVENT_TYPE_BREAK;
             }
             
             if (eventType != IO_EVENT_TYPE_COUNT) {
-                ioevent * pEvent = m_oEventPool.Create();
-                pEvent->type = eventType;
-                pEvent->pCPipe = pCPipe;
-                m_oEventQueue.Add(pEvent);
+                ioevent event;
+                event.type = eventType;
+                event.pCPipe = pCPipe;
+                m_oEventQueue.Add(event);
             }
         }
     }

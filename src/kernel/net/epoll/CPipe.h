@@ -22,14 +22,14 @@ public:
     CPipe();
     virtual ~CPipe();
     
+    void Close();
     virtual void Send(const void * pContext, const s32 nSize);
     
     s32 DoRecv();
     s32 DoSend();
     void DoClose();
     void DoConnect();
-    
-    
+
     inline void Clear() {
         Pipe::Clear();
         m_oRecvStream.clear();
@@ -44,15 +44,30 @@ public:
         m_pHost = pHost;
         pHost->m_pPipe = this;
         m_lEpollFD = lEpollFD;
-        m_lSocketHandler = lSocket;
+        SetSocketHandler(lSocket);
     }
     
-public:
+    inline void SetHost(tcore::ITcpSession * pHost) {TASSERT(m_pHost == NULL, "wtf"); m_pHost = pHost;}
+    inline tcore::ITcpSession * GetHost() {return m_pHost;}
+    
+    inline void SetEpollFD(s64 fd) {TASSERT(m_lEpollFD == -1, "wtf"); m_lEpollFD = fd;}
+    inline s64 GetEpollFD() {return m_lEpollFD;}
+    
+    inline void SetNeedPostSendOPT(bool need) {m_bNeedSend = need;}
+    inline bool IsNeedPostSendOPT() {return &m_bNeedSend;}
+    
+    inline const epollerEvent * GetEvent() {return &m_oEvent;}
+    
+    tlib::TStream<BUFF_SIZE, true> m_oRecvStream;
+    tlib::TStream<BUFF_SIZE, true> m_oSendStream;
+    
+private:
+    void PostOPTInEpollQueue(s32 opt);
+    
+private:
     tcore::ITcpSession * m_pHost;
     s64 m_lEpollFD;
     bool m_bNeedSend;
-    tlib::TStream<BUFF_SIZE, true> m_oRecvStream;
-    tlib::TStream<BUFF_SIZE, true> m_oSendStream;
     epollerEvent m_oEvent;
     static CPIPE_POOL s_oCPipePool;
 };

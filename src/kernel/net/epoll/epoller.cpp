@@ -93,15 +93,16 @@ bool epoller::AddServer(ITcpServer * server, const char * ip, const s32 port) {
     struct timeval tv;
     
     SPipe * pSPipe = NEW SPipe;
-    memset(&pSPipe->m_oAddr, 0, sizeof (pSPipe->m_oAddr));
-    pSPipe->m_oAddr.sin_family = AF_INET;
-    pSPipe->m_oAddr.sin_addr.s_addr = htonl(inet_addr(ip));
-    pSPipe->m_oAddr.sin_port = htons(port);
+    struct sockaddr_in addr;
+    tools::SafeMemset(&addr, sizeof(addr), 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(inet_addr(ip));
+    addr.sin_port = htons(port);
     
     if (-1 == (lSocket = socket(AF_INET, SOCK_STREAM, 0))
         || 0 != setsockopt(lSocket, SOL_SOCKET, SO_REUSEADDR, (const char*) &tv, sizeof (tv))
         || !setnonblocking(lSocket)
-        || 0 != bind(lSocket, (sockaddr *) & pSPipe->m_oAddr, sizeof (pSPipe->m_oAddr))
+        || 0 != bind(lSocket, (sockaddr *) & addr, sizeof (addr))
         || 0 != listen(lSocket, 200)) {
         TASSERT(false, "socket error %s", strerror(errno));
         close(lSocket);
@@ -110,7 +111,7 @@ bool epoller::AddServer(ITcpServer * server, const char * ip, const s32 port) {
     
     pSPipe->Relate(server, lSocket, m_lEpollFD);
     epoll_event ev;
-    ev.data.ptr = &(pSPipe->m_oEvent);
+    ev.data.ptr = (void *)pSPipe->GetEvent();
     ev.events = EPOLLIN | EPOLLET;
 
     s32 res = epoll_ctl(m_lEpollFD, EPOLL_CTL_ADD, lSocket, &ev);
@@ -152,7 +153,7 @@ bool epoller::AddClient(ITcpSession * client, const char * ip, const s32 port) {
         s64 lEpollFD = BalancingWorker()->GetEpollFD();
         pCPipe->Relate(client, lSocket, lEpollFD);
         epoll_event ev;
-        ev.data.ptr = &pCPipe->m_oEvent;
+        ev.data.ptr = (void *)pCPipe->GetEvent();
         ev.events = EPOLLOUT | EPOLLET;
 
         s32 res = epoll_ctl(m_lEpollFD, EPOLL_CTL_ADD, lSocket, &ev);
@@ -181,7 +182,7 @@ s64 epoller::DealEvent(s64 overtime) {
             {
                 SPipe * pSPipe = (SPipe *)pEvent->pData;
                 if (events[i].events & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) {
-                    pSPipe->m_pHost->Error(Kernel::getInstance(), NULL);
+                    pSPipe->GetHost()->Error(Kernel::getInstance(), NULL);
                 } else if (events[i].events & EPOLLIN) {
                     pSPipe->DoAccept();
                 }
@@ -192,8 +193,8 @@ s64 epoller::DealEvent(s64 overtime) {
             {
                 CPipe * pCPipe = (CPipe *)pEvent->pData;
                 if (events[i].events & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) {
-                    pCPipe->m_pHost->OnConnectFailed(Kernel::getInstance());
-                    pCPipe->m_pHost->m_pPipe = NULL;
+                    pCPipe->GetHost()->OnConnectFailed(Kernel::getInstance());
+                    pCPipe->GetHost()->m_pPipe = NULL;
                     pCPipe->Release();
                 } else if (events[i].events & EPOLLIN) {
                     pCPipe->DoConnect();

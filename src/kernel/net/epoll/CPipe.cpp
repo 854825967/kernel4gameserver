@@ -30,6 +30,24 @@ void CPipe::Release() {
     s_oCPipePool.Recover(this);
 }
 
+    
+void CPipe::PostOPTInEpollQueue(s32 opt) {
+    epoll_event ev;
+    ev.data.ptr = &m_oEvent;
+    ev.events = opt;
+    s32 res = epoll_ctl(m_lEpollFD, EPOLL_CTL_MOD, m_lSocketHandler, &ev);
+    TASSERT(0 == res, "wtf");
+}
+
+void CPipe::Close() {
+    m_nStatus = SS_WAITCLOSE;
+    m_oSendStream.LockRead();
+    if (m_bNeedSend) {
+        PostOPTInEpollQueue(EPOLLOUT | EPOLLONESHOT);
+    }
+    m_oSendStream.FreeRead();
+}
+
 void CPipe::Send(const void * pContext, const s32 nSize) {
     TASSERT(m_nStatus == SS_ESTABLISHED, "wtf");
     if (m_nStatus != SS_ESTABLISHED) {
@@ -39,11 +57,10 @@ void CPipe::Send(const void * pContext, const s32 nSize) {
     m_oSendStream.in(pContext, nSize);
     m_oSendStream.LockRead();
     if (m_bNeedSend) {
-        static s32 nSendSize = Configmgr::getInstance()->GetCoreConfig()->sNetSendSize;
         while (true) {
             s32 nLen = m_oSendStream.size();
             if (nLen > 0) {
-                s32 nSendLen = send(m_lSocketHandler, m_oSendStream.buff(), (nLen >= nSendSize)?nSendSize:nLen, 0);
+                s32 nSendLen = send(m_lSocketHandler, m_oSendStream.buff(), nLen, 0);
                 if (nSendLen > 0) {
                     m_oSendStream.out(nSendLen);
                 } else if (nSendLen == -1 && EAGAIN == tools::GetLastErrno()) {
@@ -51,20 +68,14 @@ void CPipe::Send(const void * pContext, const s32 nSize) {
                     m_oSendStream.FreeRead();
                     break;
                 } else {
-                    ECHO("send error %d", tools::GetLastErrno());
-                    DoClose();
-                    m_pHost->OnDisconnect(Kernel::getInstance());
-                    m_pHost->m_pPipe = NULL;
-                    Release();
                     m_oSendStream.FreeRead();
+                    ECHO("send error %d", tools::GetLastErrno());
+                    PostOPTInEpollQueue(EPOLLERR | EPOLLHUP | EPOLLRDHUP);
                     break;
                 }
             } else if (m_nStatus == SS_WAITCLOSE) {
-                DoClose();
-                m_pHost->OnDisconnect(Kernel::getInstance());
-                m_pHost->m_pPipe = NULL;
-                Release();
                 m_oSendStream.FreeRead();
+                PostOPTInEpollQueue(EPOLLERR | EPOLLHUP | EPOLLRDHUP);
                 break;
             } else {
                 m_bNeedSend = true;
@@ -72,16 +83,23 @@ void CPipe::Send(const void * pContext, const s32 nSize) {
                 break;
             }
         }
+    } else {
+        m_oSendStream.FreeRead();
     }
 }
 
 void CPipe::DoClose() {
-    TASSERT(m_nStatus != SS_UNINITIALIZE, "wtf");
+    TASSERT(m_nStatus != SS_UNINITIALIZE && m_lSocketHandler != -1, "wtf");
     if (m_nStatus != SS_UNINITIALIZE) {
         m_nStatus = SS_UNINITIALIZE;
         s32 res = epoll_ctl(m_lEpollFD, EPOLL_CTL_DEL, m_lSocketHandler, NULL);
         TASSERT(0 == res, "epoll_ctl del error %d", tools::GetLastErrno());
+        linger _linger;
+        _linger.l_onoff = 0;
+        _linger.l_linger = 0;
+        setsockopt(m_lSocketHandler, SOL_SOCKET, SO_LINGER, (const char *)&_linger, sizeof(_linger));
         close(m_lSocketHandler);
+        m_lSocketHandler = -1;
     }
 }
 
@@ -96,7 +114,6 @@ s32 CPipe::DoRecv() {
         }
         
         if (len <= 0) {
-            ECHO("link over or recv error %d", tools::GetLastErrno());
             DoClose();
             return IO_EVENT_TYPE_BREAK;
         }
@@ -112,32 +129,43 @@ s32 CPipe::DoRecv() {
     return IO_EVENT_TYPE_COUNT;
 }
 
-s32 CPipe::DoConnect() {
-    m_pHost->OnConnected(Kernel::getInstance());
+void CPipe::DoConnect() {
+    epoll_event ev;
+    ev.data.ptr = &m_oEvent;
+    ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
+    
+    m_nStatus = SS_ESTABLISHED;
+    s32 res = epoll_ctl(m_lEpollFD, EPOLL_CTL_ADD, m_lSocketHandler, &ev);
+    TASSERT(0 == res, "epoll ctl error %d", tools::GetLastErrno());
+    if (0 == res) {
+        m_pHost->OnConnected(Kernel::getInstance());
+    } else {
+        m_nStatus = SS_UNINITIALIZE;
+        close(m_lSocketHandler);
+        m_pHost->m_pPipe = NULL;
+        m_pHost->OnConnectFailed(Kernel::getInstance());
+        Release();
+    }
 }
 
 s32 CPipe::DoSend() {
-    static s32 nSize = Configmgr::getInstance()->GetCoreConfig()->sNetSendSize;
-    
-    m_oSendStream.LockRead();
     while (true) {
+        m_oSendStream.LockRead();
         s32 nLen = m_oSendStream.size();
         if (nLen > 0) {
-            s32 nSendLen = send(m_lSocketHandler, m_oSendStream.buff(), (nLen >= nSize)?nSize:nLen, 0);
+            s32 nSendLen = send(m_lSocketHandler, m_oSendStream.buff(), nLen, 0);
             if (nSendLen > 0) {
                 m_oSendStream.out(nSendLen);
+                m_oSendStream.FreeRead();
             } else if (nSendLen == -1 && EAGAIN == tools::GetLastErrno()) {
                 m_oSendStream.FreeRead();
                 return IO_EVENT_TYPE_COUNT;
             } else {
-                ECHO("send error %d", tools::GetLastErrno());
                 m_oSendStream.FreeRead();
-                DoClose();
+                ECHO("send error %d", tools::GetLastErrno());
                 return IO_EVENT_TYPE_BREAK;
             }
-            
         } else if (m_nStatus == SS_WAITCLOSE) {
-            DoClose();
             m_oSendStream.FreeRead();
             return IO_EVENT_TYPE_BREAK;
         } else {

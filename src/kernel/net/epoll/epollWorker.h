@@ -49,7 +49,6 @@ private:
     s8 m_nStatus;
     s64 m_lEpollFd;
     s64 m_lOptCount;
-    IOEVENT_POOL m_oEventPool;
     IOEVENT_QUEUE m_oEventQueue;
 };
 
