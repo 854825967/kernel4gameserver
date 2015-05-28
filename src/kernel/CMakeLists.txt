@@ -60,14 +60,17 @@ SET(KERNEL_LOGIC_MGR
     )
 
 SET(KERNEL_TIMER_MGR
-    "${PROJECT_SOURCE_DIR}/src/kernel/timermgr/TimerHandler.h"
+    "${PROJECT_SOURCE_DIR}/src/kernel/timermgr/TimeNode.h"
+    "${PROJECT_SOURCE_DIR}/src/kernel/timermgr/TimeNode.cpp"
     "${PROJECT_SOURCE_DIR}/src/kernel/timermgr/Timermgr.h"
     "${PROJECT_SOURCE_DIR}/src/kernel/timermgr/Timermgr.cpp"
+    "${PROJECT_SOURCE_DIR}/src/kernel/timermgr/TimeSlot.h"
+    "${PROJECT_SOURCE_DIR}/src/kernel/timermgr/TimeSlot.cpp"
     )
 
 SET(KERNEL_LOGGER
-    "${PROJECT_SOURCE_DIR}/src/kernel/log/Logger.h"
-    "${PROJECT_SOURCE_DIR}/src/kernel/log/Logger.cpp"
+    "${PROJECT_SOURCE_DIR}/src/kernel/logger/Logger.h"
+    "${PROJECT_SOURCE_DIR}/src/kernel/logger/Logger.cpp"
     )
 
 SET(KERNEL
@@ -86,6 +89,7 @@ SOURCE_GROUP(src\\logicmgr FILES ${KERNEL_LOGIC_MGR})
 SOURCE_GROUP(src\\timermgr FILES ${KERNEL_TIMER_MGR})
 SOURCE_GROUP(src\\iocper FILES ${KERNEL_IOCPER})
 SOURCE_GROUP(src\\epoller FILES ${KERNEL_EPOLLER})
+SOURCE_GROUP(src\\logger FILES ${KERNEL_LOGGER})
 SOURCE_GROUP(src FILES ${KERNEL})
 
 IF(UNIX)

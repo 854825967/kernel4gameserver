@@ -28,19 +28,7 @@ public:
     }
 
     virtual void OnTime(IKernel * pKernel, const s32 sTimerID, s64 lTimetick) {
-        if (!m_bIsConnected) {
-            pKernel->KillTimer(this);
-            return;
-        }
 
-        char buff[2048 + sizeof(testmsgheader)];
-        testmsgheader * pHeader = (testmsgheader *)buff;
-        pHeader->msgid = TEST_MSG_ID_BROADCAST;
-        pHeader->size = sizeof(buff);
-        pHeader->ltick = tools::GetTimeMillisecond();
-        pHeader->pThis = this;
-        *(s32 *)(buff + sizeof(testmsgheader)) = m_nGroupID;
-        Send(buff, sizeof(buff));
     }
 
     //called after last OnTimer or remove timer, do not affect OnTimer count
@@ -50,25 +38,7 @@ public:
     }
 
     virtual s32 OnRecv(IKernel * pKernel, const void * context, const s32 size) {
-        s32 nLen = *(const s32 *)context;
-        if (nLen > 4096) {
-            Close();
-            return 0;
-        }
-
-        if (nLen <= size && nLen >= sizeof(testmsgheader)) {
-            testmsgheader * pHeader = (testmsgheader *)context;
-            s64 lTick = tools::GetTimeMillisecond() - pHeader->ltick;
-            if (pHeader->pThis != this) {
-                //ECHO("broadcast delay %ld", lTick);
-            } else {
-                ECHO("self recv delay %ld", lTick);
-            }
-            
-            return nLen;
-        } else {
-            return 0;
-        }
+        return size;
     }
 
     virtual void OnDisconnect(IKernel * pKernel) {
@@ -83,19 +53,6 @@ public:
         s_nLinkCount++;
         TASSERT(s_nLinkCount > 0 && m_bIsConnected == false, "wtf");
         m_bIsConnected = true;
-
-        const s32 nSize = Rand() % 2048 + 20 + sizeof(testmsgheader);
-        char * pBuff = NEW char[nSize];
-        testmsgheader * pHeader = (testmsgheader *)pBuff;
-        pHeader->msgid = TEST_MSG_ID_SET_GROUP;
-        pHeader->size = nSize;
-        pHeader->ltick = tools::GetTimeMillisecond();
-        pHeader->pThis = this;
-        *(s32 *)(pBuff + sizeof(testmsgheader)) = m_nGroupID;
-        Send(pBuff, nSize);
-        delete pBuff;
-        static s32 timerid = 0;
-        pKernel->StartTimer(timerid++, this, 500);
     }
 
     virtual void OnConnectFailed(IKernel * pKernel) {

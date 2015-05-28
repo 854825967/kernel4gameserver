@@ -26,7 +26,6 @@ public:
     // tiemr interface 
     virtual bool StartTimer(s32 id, tcore::ITimer * timer, s64 interval, s64 delay, s64 loop) ;
     virtual bool KillTimer(s32 id, tcore::ITimer * timer);
-    virtual bool KillTimer(tcore::ITimer * timer);
 
     virtual void Shutdown();
     void Loop();

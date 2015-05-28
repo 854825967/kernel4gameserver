@@ -196,7 +196,7 @@ s64 epoller::DealEvent(s64 overtime) {
                     pCPipe->GetHost()->OnConnectFailed(Kernel::getInstance());
                     pCPipe->GetHost()->m_pPipe = NULL;
                     pCPipe->Release();
-                } else if (events[i].events & EPOLLIN) {
+                } else if (events[i].events & EPOLLOUT) {
                     pCPipe->DoConnect();
                 }
                 break;

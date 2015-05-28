@@ -50,12 +50,12 @@ typedef int64_t s64;
 #define SafeSprintf sprintf_s
 
 #define ECHO(format, ...) { \
-	char log[4096] = {0}; \
-	SafeSprintf(log, 4096, "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+	char log[1024] = {0}; \
+	SafeSprintf(log, sizeof(log), "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
 	printf("%s\n", log);}
 
 #define ECHO_TRACE(format, ...) {\
-    char _log[4096] = {0}; \
+    char _log[1024] = {0}; \
     SafeSprintf(_log, sizeof(_log), format, ##__VA_ARGS__); \
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN); \
     printf("[trace]%s|%d|%s>>>%s\n", __FILE__, __LINE__, __FUNCTION__, _log); \
@@ -63,7 +63,7 @@ typedef int64_t s64;
 }
 
 #define ECHO_ERROR(format, ...) {\
-    char _log[4096] = {0}; \
+    char _log[1024] = {0}; \
     SafeSprintf(_log, sizeof(_log), format, ##__VA_ARGS__); \
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED); \
     printf("[error]%s|%d|%s>>>%s\n", __FILE__, __LINE__, __FUNCTION__, _log); \

@@ -9,61 +9,39 @@
 #define	__Timermgr_h__
 
 #include "ITimermgr.h"
-#include "TPool.h"
-#include <list>
+#include "TimeSlot.h"
 #include <map>
-
-class timer_index {
-public:
-    
-    explicit timer_index(s32 id, const tcore::ITimer * p) {
-        m_id = id;
-        m_p = p;
-    }
-    
-    timer_index & operator=(const timer_index & index) {
-        tools::SafeMemcpy(this, sizeof(*this), &index, sizeof(*this));
-        return *this;
-    }
-
-    bool operator==(const timer_index & index) const {
-        return m_id == index.m_id && m_p == index.m_p;
-    }
-
-    bool operator<(const timer_index & index) const {
-        return (this->m_id + (s64) this->m_p) < (index.m_id + (s64) index.m_p);
-    }
-
-private:
-    s32 m_id;
-    const tcore::ITimer * m_p;
-};
-class TimerHandler;
+class TimeNode;
+typedef std::map<s32, TimeSlot*> TIMESLOT_MAP;
 
 class Timermgr : public ITimermgr {
-    typedef std::list<TimerHandler *> TIMER_LIST;
-    typedef std::map<timer_index, TimerHandler *> TIMER_MAP;
-    typedef std::map<s64, TIMER_LIST> TIMER_WHOOL;
 public:
-    static ITimermgr * getInstance();
+    static Timermgr * getInstance(s32 scale = 20);
+
     virtual bool Redry();
     virtual bool Initialize();
     virtual bool Destory();
+    virtual s64 Processing();
 
-    // tiemr interface 
+    // tiemr interface
     virtual bool StartTimer(s32 id, tcore::ITimer * timer, s64 interval, s64 delay, s64 loop);
     virtual bool KillTimer(s32 id, tcore::ITimer * timer);
-    virtual bool KillTimer(tcore::ITimer * timer);
+    virtual bool PauseTimer(s32 id, tcore::ITimer * timer);
+    virtual bool ResumeTimer(s32 id, tcore::ITimer * timer);
 
-    virtual s64 Dotimer();
+    bool ResetTimeNode(TimeNode * pNode);
 private:
-    Timermgr();
+    void SlotAdd(s32 nCursor, TimeNode * pNode);
+    void SlotRun(s32 nCursor, s64 lTick);
+
+    Timermgr(s32 scale);
     ~Timermgr();
 
 private:
-    TIMER_MAP m_mapTimer;
-    TIMER_WHOOL m_mapTimerWhool;
-    tlib::TPool<TimerHandler, false> m_poolTimer;
+    s64 m_lStartRunTick; //开始执行时间
+    s32 m_nTimeScale; //时间刻度
+    s32 m_nCursor; //游标
+    TIMESLOT_MAP m_oTimeSlotMap; //时间槽
 };
 
 #endif	/* __Timermgr_h__ */

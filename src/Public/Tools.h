@@ -51,7 +51,6 @@ namespace tools {
 #elif defined  linux
             return errno;
 #endif //linux
-
         }
         
         inline const char * GetAppPath() {
@@ -82,19 +81,30 @@ namespace tools {
             return pStrPath;
         }
 
-        inline s64 GetTimeMillisecond() {
-#ifdef WIN32    
-            SYSTEMTIME wtm;
-            GetLocalTime(&wtm);
-            struct tm tTm;
-            tTm.tm_year     = wtm.wYear - 1900;
-            tTm.tm_mon      = wtm.wMonth;
-            tTm.tm_mday     = wtm.wDay;
-            tTm.tm_hour     = wtm.wHour;
-            tTm.tm_min      = wtm.wMinute;
-            tTm.tm_sec      = wtm.wSecond;
-            tTm.tm_isdst    = -1;
-            return (s64)mktime(&tTm) * 1000 + (s64)wtm.wMilliseconds;
+// #ifdef WIN32    
+// #pragma warning (push)
+// #pragma warning (disable: 4035)
+//         inline u64 timestamp() {
+//             __asm rdtsc
+//         }
+// #pragma warning (pop)
+
+        inline u64 GetTimeMillisecond() {
+#ifdef WIN32
+            typedef union {
+                unsigned __int64 ft_scalar;
+                FILETIME ft_struct;
+            } FT;
+            // Number of 100 nanosecond units from 1/1/1601 to 1/1/1970
+#define EPOCH_BIAS  116444736000000000i64
+
+            // 获得64位的当前时间,精确到ms
+                s64 tim;
+                FT nt_time;
+                GetSystemTimeAsFileTime( &(nt_time.ft_struct) );
+                tim = (s64)((nt_time.ft_scalar - EPOCH_BIAS) / 10000);
+
+                return tim;
 #elif defined linux
             struct timeval tv;
             gettimeofday(&tv, NULL);

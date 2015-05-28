@@ -2,7 +2,7 @@
 #include "configmgr/Configmgr.h"
 #include "logicmgr/Logicmgr.h"
 #include "timermgr/Timermgr.h"
-#include "log/Logger.h"
+#include "logger/Logger.h"
 using namespace tcore;
 
 #ifdef linux
@@ -71,7 +71,10 @@ void Kernel::Loop() {
     m_bShutdown = false;
     while (!m_bShutdown) {
         s64 lUse = netengine::getInstance()->Processing(Configmgr::getInstance()->GetCoreConfig()->sNetframetick);
-        s64 tick = Timermgr::getInstance()->Dotimer();
+        lUse = Timermgr::getInstance()->Processing();
+        if (lUse > 10) {
+            ECHO("Timermgr processing %ld", lUse);
+        }
     }
 }
 
@@ -112,10 +115,6 @@ bool Kernel::StartTimer(s32 id, tcore::ITimer * timer, s64 interval, s64 delay, 
 }
 
 bool Kernel::KillTimer(s32 id, tcore::ITimer * timer) {
-    return Timermgr::getInstance()->KillTimer(id, timer);
+    //return Timermgr::getInstance()->KillTimer(id, timer);
+    return true;
 }
-
-bool Kernel::KillTimer(tcore::ITimer * timer) {
-    return Timermgr::getInstance()->KillTimer(timer);
-}
-

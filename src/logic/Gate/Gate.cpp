@@ -11,11 +11,6 @@ bool Gate::Initialize(IKernel * pKernel) {
     return true;
 }
 
-bool Gate::Launched(IKernel * pKernel) {
-    pKernel->StartTcpServer(this, "0.0.0.0", 12580);
-    return true;
-}
-
 bool Gate::Destroy(IKernel * pKernel) {
     return true;
 }

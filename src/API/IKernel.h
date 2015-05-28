@@ -6,6 +6,11 @@
 
 class IModule;
 
+#define LOG_TRACE(format, ...) { \
+    char log[4096] = {0}; \
+    SafeSprintf(log, 4096, "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+    Kernel::getInstance()->LogDebug(log);}
+
 namespace tcore {
     class IKernel;
 
@@ -82,7 +87,6 @@ namespace tcore {
         // tiemr interface 
         virtual bool StartTimer(s32 id, tcore::ITimer * timer, s64 interval, s64 delay = 0, s64 loop = -1) = 0; //-1 is forever
         virtual bool KillTimer(s32 id, ITimer * timer) = 0;
-        virtual bool KillTimer(tcore::ITimer * timer) = 0;
 
         //shutdown kernel
         virtual void Shutdown() = 0;

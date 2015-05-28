@@ -4,31 +4,24 @@
  * 
  * Created on March 5, 2015, 11:02 AM
  */
-
 #include "Timermgr.h"
-#include "Tools.h"
-#include "TimerHandler.h"
+#include "TimeNode.h"
 
-Timermgr::Timermgr() {
-
+Timermgr::Timermgr(s32 scale) {
+    m_nTimeScale = scale;
 }
 
 Timermgr::~Timermgr() {
-
 }
 
-ITimermgr * Timermgr::getInstance() {
-    static Timermgr * p = NULL;
-    if (NULL == p) {
-        p = NEW Timermgr;
-        if (!p->Redry()) {
-            TASSERT(false, "Timermgr cant ready");
-            delete p;
-            p = NULL;
-        }
+Timermgr * Timermgr::getInstance(s32 scale){
+    static Timermgr * pTimermgr = NULL;
+    if (NULL == pTimermgr) {
+        pTimermgr = NEW Timermgr(scale);
+        TASSERT(pTimermgr, "wtf");
     }
 
-    return p;
+    return pTimermgr;
 }
 
 bool Timermgr::Redry() {
@@ -36,129 +29,72 @@ bool Timermgr::Redry() {
 }
 
 bool Timermgr::Initialize() {
+    m_nCursor = 0; //游标
+    m_lStartRunTick = tools::GetTimeMillisecond(); //开始执行时间
     return true;
 }
 
 bool Timermgr::Destory() {
+    delete this;
     return true;
 }
 
 // tiemr interface 
-
 bool Timermgr::StartTimer(s32 id, tcore::ITimer * timer, s64 interval, s64 delay, s64 loop) {
-    TASSERT(timer && loop != LOOP_OVER && interval >= 100 && delay >= 0, "check ur timer args");
-    s64 lTick = tools::GetTimeMillisecond();
-    {
-        TIMER_MAP::iterator itor = m_mapTimer.find(timer_index(id, timer));
-        if (itor != m_mapTimer.end()) {
-            TASSERT(false, "timer id has been rgs");
-            return false;
-        }
-    }
-
-    TimerHandler * pHandler = m_poolTimer.Create();
-    pHandler->m_sID = id;
-    pHandler->m_sInterval = interval;
-    pHandler->m_sNextRunTick = lTick + interval + delay;
-    pHandler->m_sStatus = TIMER_STATUS_RUN;
-    pHandler->m_sLoop = loop;
-    pHandler->m_pTimer = timer;
-
-    {
-        TIMER_WHOOL::iterator itor = m_mapTimerWhool.find(interval);
-        if (itor == m_mapTimerWhool.end()) {
-            m_mapTimerWhool.insert(make_pair(interval, TIMER_LIST()));
-            itor = m_mapTimerWhool.find(interval);
-        }
-
-        if (itor->second.empty()) {
-            itor->second.push_back(pHandler);
-        } else {
-            TIMER_LIST::iterator list_itor = itor->second.begin();
-            TIMER_LIST::iterator list_iend = itor->second.end();
-            while (list_itor != list_iend) {
-                if (pHandler->m_sNextRunTick > (*list_itor)->m_sNextRunTick) {
-                    list_itor++;
-                } else {
-                    itor->second.insert(list_itor, pHandler);
-                    break;
-                }
-            }
-            
-            if (list_itor == list_iend) {
-                itor->second.push_back(pHandler);
-            }
-        }
-
-    }
-
-    m_mapTimer.insert(make_pair(timer_index(id, timer), pHandler));
-    timer->OnStart(Kernel::getInstance(), id, lTick);
-
+    TASSERT(interval >= 100, "wtf");
+    TimeNode * pNode = TimeNode::SetTimer(id, timer, interval, loop, delay);
+    ResetTimeNode(pNode);
     return true;
+}
+
+void Timermgr::SlotAdd(s32 nCursor, TimeNode * pNode) {
+    TIMESLOT_MAP::iterator itor = m_oTimeSlotMap.find(nCursor);
+    if (itor == m_oTimeSlotMap.end()) {
+        itor = m_oTimeSlotMap.end();
+        itor = m_oTimeSlotMap.insert(itor, TIMESLOT_MAP::value_type(nCursor, TimeSlot::GetTimeSlot()));
+    }
+    itor->second->Add(pNode);
+}
+
+void Timermgr::SlotRun(s32 nCursor, s64 lTick) {
+    TIMESLOT_MAP::iterator itor = m_oTimeSlotMap.find(nCursor);
+    if (itor != m_oTimeSlotMap.end()) {
+        itor->second->Run(lTick);
+        itor->second->Release();
+        m_oTimeSlotMap.erase(itor);
+    }
 }
 
 bool Timermgr::KillTimer(s32 id, tcore::ITimer * timer) {
-    s64 now = tools::GetTimeMillisecond();
-    TIMER_MAP::iterator itor = m_mapTimer.find(timer_index(id, timer));
-    if (itor == m_mapTimer.end()) {
-        TASSERT(false, "timer id dosnt exist");
-        return false;
-    }
-
-    itor->second->m_sStatus = TIMER_STATUS_WAITING_REMOVE;
-    itor->second->m_pTimer->OnTerminate(Kernel::getInstance(), itor->second->m_sID, false, now);
-    m_mapTimer.erase(itor);
-    return true;
-}
-
-bool Timermgr::KillTimer(tcore::ITimer * timer) {
-    s64 now = tools::GetTimeMillisecond();
-    TIMER_MAP::iterator itor = m_mapTimer.begin();
-    TIMER_MAP::iterator iend = m_mapTimer.end();
-    while (itor != iend) {
-        if (itor->second->m_pTimer == timer) {
-            itor->second->m_sStatus = TIMER_STATUS_WAITING_REMOVE;
-            itor->second->m_pTimer->OnTerminate(Kernel::getInstance(), itor->second->m_sID, false, now);
-            m_mapTimer.erase(itor++);
-        } else {
-            itor++;
-        }
+    if (TimeNode::FindNode(id, timer, true) == NULL) {
+        ECHO_ERROR("timer %lx id %d not exist", timer, id);
     }
 
     return true;
 }
 
-s64 Timermgr::Dotimer() {
+bool Timermgr::PauseTimer(s32 id, tcore::ITimer * timer) {
+    return false;
+}
+
+bool Timermgr::ResumeTimer(s32 id, tcore::ITimer * timer) {
+    return false;
+}
+
+bool Timermgr::ResetTimeNode(TimeNode * pNode) {
+    TASSERT(pNode->GetStatus() == TIMER_STATUS_RUN, "wtf");
+    s32 nOffset = (pNode->GetNextRunTick() - m_lStartRunTick)/m_nTimeScale;
+    SlotAdd(nOffset, pNode);
+    return true;
+}
+
+s64 Timermgr::Processing() {
     s64 lTick = tools::GetTimeMillisecond();
-
-    TIMER_WHOOL::iterator itor = m_mapTimerWhool.begin();
-    TIMER_WHOOL::iterator iend = m_mapTimerWhool.end();
-    while (itor != iend) {
-        {
-            TIMER_LIST::iterator ilist_itor = itor->second.begin();
-            TIMER_LIST::iterator ilist_iend = itor->second.end();
-            while (ilist_itor != ilist_iend) {
-                TimerHandler * pHandler = *ilist_itor;
-                if (pHandler->IsRunTime(lTick)) {
-                    pHandler->OnTimer(lTick);
-
-                    itor->second.erase(ilist_itor++);
-                    if (pHandler->m_sStatus != TIMER_STATUS_WAITING_REMOVE) {
-                        itor->second.push_back(pHandler);
-                        ilist_iend = itor->second.end();
-                    }
-                } else if (pHandler->m_sStatus == TIMER_STATUS_WAITING_REMOVE) {
-                    itor->second.erase(ilist_itor++);
-                } else {
-                    break;
-                }
-            }
-        }
-
-        itor++;
+    s32 nTick = lTick - m_lStartRunTick;
+    s32 nCursor = (nTick/m_nTimeScale);
+    for (; m_nCursor < nCursor; m_nCursor++) {
+        SlotRun(m_nCursor, lTick);
     }
-
 
     return tools::GetTimeMillisecond() - lTick;
 }

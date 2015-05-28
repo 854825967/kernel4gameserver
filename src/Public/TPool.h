@@ -75,13 +75,13 @@ namespace tlib {
             }
             POOL_OPT_LOCK(lock, m_pLock);
 
-            typename UNIT_POOL::iterator ibegin = m_list.begin();
-            typename UNIT_POOL::iterator iend = m_list.end();
-            typename UNIT_POOL::iterator itor = ::find(ibegin, iend, (type_info *)pUnit);
-            if (itor != iend) {
-                POOL_OPT_FREELOCK(lock, m_pLock);
-                return false;
-            }
+//             typename UNIT_POOL::iterator ibegin = m_list.begin();
+//             typename UNIT_POOL::iterator iend = m_list.end();
+//             typename UNIT_POOL::iterator itor = ::find(ibegin, iend, (type_info *)pUnit);
+//             if (itor != iend) {
+//                 POOL_OPT_FREELOCK(lock, m_pLock);
+//                 return false;
+//             }
             ((type_info *)pUnit)->status = IS_FREE;
             m_list.push_back((type_info *)pUnit);
 
